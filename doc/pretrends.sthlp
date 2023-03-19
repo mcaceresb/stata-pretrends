@@ -26,7 +26,7 @@ Stata version of the pretrends R package, which implements power calculations an
 {pstd}
 At least one of {opt numpre()} or {opt pre()} and {opt post()} are required options to indicate which portion of the vector correspond to the pre and post periods; at least one of {opt power()}, {opt slope()}, or {opt delta()} must be specified as well.
 
-{synoptset 27 tabbed}{...}
+{synoptset 25 tabbed}{...}
 {marker table_options}{...}
 {synopthdr}
 {synoptline}
@@ -59,10 +59,10 @@ See the {browse "https://github.com/mcaceresb/stata-pretrends#readme":online exa
 {title:Example 1: Linear Trend}
 
 {phang2}{cmd:. tempname beta sigma                                          }{p_end}
-{phang2}{cmd:. mata {                                                       }{p_end}
-{phang2}{cmd:.     st_matrix(st_local("beta"),  PreTrendsExampleBeta())     }{p_end}
-{phang2}{cmd:.     st_matrix(st_local("sigma"), PreTrendsExampleSigma())    }{p_end}
-{phang2}{cmd:. }                                                            }{p_end}
+{phang2}{cmd:. mata {c -(}                                                  }{p_end}
+{phang2}{cmd:      st_matrix(st_local("beta"),  PreTrendsExampleBeta())     }{p_end}
+{phang2}{cmd:      st_matrix(st_local("sigma"), PreTrendsExampleSigma())    }{p_end}
+{phang2}{cmd:  {c )-}                                                       }{p_end}
 {phang2}{cmd:. pretrends, numpre(3) b(`beta') v(`sigma') power(0.5) coefplot}{p_end}
 
 {title:Example 2: Quadratic Custom Trend}
@@ -76,7 +76,7 @@ See the {browse "https://github.com/mcaceresb/stata-pretrends#readme":online exa
 {pstd}
 {cmd:pretrends} stores the following in {cmd:r()}:
 
-{synoptset 23 tabbed}{...}
+{synoptset 13 tabbed}{...}
 {p2col 5 23 26 2: Scalars}{p_end}
 {synopt:{cmd:r(slope)}}linear slope if one was provided or calculated{p_end}
 {synopt:{cmd:r(Power)}}estimated power (probability that we find a significant pre-trend under hypothesized trend){p_end}
@@ -118,3 +118,4 @@ The following data are available in {cmd:r(mata)} (default name: PreTrendsResult
 
 {pstd}
 See the paper by {browse "https://www.jonathandroth.com/assets/files/roth_pretrends_testing.pdf":Roth (2022)}.
+
