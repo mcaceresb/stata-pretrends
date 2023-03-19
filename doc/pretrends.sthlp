@@ -21,7 +21,7 @@ Stata version of the pretrends R package, which implements power calculations an
 {p 8 15 2}
 {cmd:pretrends}
 {cmd:,}
-[{it:{help honestdid##table_options:options}} {it:{help coefplot:coefplot_options}}]
+[{it:{help pretrends##table_options:options}} {it:{help coefplot:coefplot_options}}]
 
 {pstd}
 At least one of {opt numpre()} or {opt pre()} and {opt post()} are required options to indicate which portion of the vector correspond to the pre and post periods; at least one of {opt power()}, {opt slope()}, or {opt delta()} must be specified as well.

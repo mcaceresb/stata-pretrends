@@ -10,7 +10,7 @@ This is the Stata version of the [R package of the same name](https://github.com
 If you’re not an R or Stata user, you may also be interested in the associated
 [Shiny app](https://github.com/jonathandroth/PretrendsPower).
 
-`version 0.2.0 19Mar2023` | [Background](#background) | [Installation](#installation) | [Examples](#examples)
+`version 0.2.0 19Mar2023` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
 
 ## Installation
 
