@@ -1,0 +1,17 @@
+v 0.2.0
+d
+d 'PRETRENDS': Pretrends
+d
+d KW: pretrends
+d KW: did
+d KW: diff-in-diff
+d KW: event study
+d
+d Requires: Stata version 15.1
+d
+d Distribution-Date: 20230319
+d
+f src/build/lpretrends.mlib
+f src/ado/pretrends.ado
+f doc/pretrends.sthlp
+f src/mata/pretrends.mata
