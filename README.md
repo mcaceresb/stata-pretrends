@@ -86,7 +86,7 @@ pre-treatment coefficient.)
 pretrends, numpre(3) b(beta) v(sigma) power(0.5) coefplot
 ```
 
-Note the `coefplot` option, which requires the package of the sanem
+Note the `coefplot` option, which requires the package of the same
 name. This is not required, but if specified will produce an event-study
 plot and add a user-hypothesized difference in trends.  In this case, we
 can see the linear trend against which pre-tests have 50 percent power.
