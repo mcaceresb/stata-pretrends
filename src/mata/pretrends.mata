@@ -165,6 +165,8 @@ struct PreTrendsResults scalar PreTrendsParse(string scalar b,
         results.sigma   = st_matrix(V)[selomit, selomit][sel, sel]
         results.numPrePeriods  = length(results.prePeriodIndices)
         results.numPostPeriods = length(results.postPeriodIndices)
+        results.prePeriodIndices  = 1..(results.numPrePeriods)
+        results.postPeriodIndices = (results.numPrePeriods+1)..length(results.betahat)
     }
 
     results.omit    = (omit != "")
@@ -182,15 +184,32 @@ real scalar function PreTrendsPower(struct PreTrendsResults scalar results)
 {
     real matrix sigmaPre
     real vector relative
-    real scalar thresh, lower, upper
+    real scalar i, thresh, lower, upper
+    string scalar powerstr
 
     thresh   = invnormal(1-results.alpha/2)
     sigmaPre = results.sigma[results.prePeriodIndices, results.prePeriodIndices]
     relative = results.timeVec[results.prePeriodIndices] :- results.referencePeriod
     lower    = 0
     upper    = 8 * max(sqrt(diagonal(sigmaPre)))
-    // Max expected iterations are upper * log(1/epsilon(1)^0.75)/log(2), which is 39 * upper (so 1k is plenty)
 
+    if ( PreTrendsPowerFun(lower, sigmaPre, thresh, relative) > results.power ) {
+        powerstr = strtrim(sprintf("%9.6g%%", results.power))
+        errprintf("PreTrendsPower(): Power level %s too low; please increase power.\n", powerstr)
+        _error(198)
+    }
+
+    i = 0
+    while ( (++i < 10) & (PreTrendsPowerFun(upper, sigmaPre, thresh, relative) < results.power) ) {
+        upper = 2 * upper
+    }
+
+    if ( PreTrendsPowerFun(upper, sigmaPre, thresh, relative) < results.power ) {
+        powerstr = strtrim(sprintf("%9.6g%%", results.power))
+        errprintf("PreTrendsPower(): Power level %s too high; please decrease power.\n", powerstr)
+    }
+
+    // Max expected iterations are upper * log(1/epsilon(1)^0.75)/log(2), which is 39 * upper (so 1k is plenty)
     return(PreTrendsBisect(&PreTrendsPowerFun(), lower, upper, results.power, 1000, sigmaPre, thresh, relative))
 }
 

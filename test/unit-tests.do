@@ -1,12 +1,12 @@
 version 15.1
 qui do test/unit-tests-basic.do
-
-xx mainly you just have to add tests
+* qui do src/ado/pretrends.ado
+* qui do src/mata/pretrends.mata
 
 capture program drop main
 program main
-    unit_test basic_failures, xx
-    unit_test basic_checks,   xx
+    unit_test basic_failures
+    unit_test basic_checks
 end
 
 capture program drop unit_test

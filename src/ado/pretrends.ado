@@ -1,4 +1,4 @@
-*! version 0.3.0 20Mar2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
+*! version 0.3.1 20Mar2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
 *! Power calculations and visualization for pre-trends tests (translation of R package)
 
 * xx add timeVec and reference period
@@ -11,11 +11,11 @@ program pretrends, rclass
                     Vcov(str)                  /// name of vcov matrix; default is e(V)
                                                ///
                     omit                       /// Omit levels parsing b vector column names
+                    alpha(passthru)            /// significance level
                     NUMPREperiods(int 0)       /// number of pre-treatment periods
                     PREperiodindices(numlist)  /// pre-period indices
                     POSTperiodindices(numlist) //  post-period indices
     local fullopts  slope(passthru)            /// hypothesized difference in trends
-                    alpha(passthru)            /// significance level
                     DELTAtrue(str)             /// name of matrix with hypothesized trend
                                                ///
                     MATAsave(str)              /// Save resulting mata object
@@ -106,7 +106,7 @@ program pretrends, rclass
     if ( `poweronly' ) {
         tempname slope
         mata st_numscalar(st_local("slope"), `results'.slope)
-        mata printf("Slope for %s power = %9.6g", strtrim(sprintf("%9.6g%%", 100 * `results'.power)), `results'.slope)
+        mata printf("Slope for %s power = %9.6g\n", strtrim(sprintf("%9.6g%%", 100 * `results'.power)), `results'.slope)
         return scalar Power = `power'
         return scalar slope = `slope'
         mata mata drop `results'

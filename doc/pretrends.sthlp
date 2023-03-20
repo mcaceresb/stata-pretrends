@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.3.0 20Mar2023}{...}
+{* *! version 0.3.1 20Mar2023}{...}
 {viewerdialog pretrends "dialog pretrends"}{...}
 {vieweralsosee "[R] pretrends" "mansection R pretrends"}{...}
 {viewerjumpto "Syntax" "pretrends##syntax"}{...}
@@ -42,11 +42,11 @@ At least one of {opt numpre()} or {opt pre()} and {opt post()} are required opti
 {synopt :{opth pre:periodindex(numlist)}} pre-period indices (required or specify numpreperiods()){p_end}
 {synopt :{opth post:periodindex(numlist)}} post-period indices (required or specify numpreperiods()){p_end}
 {synopt :{opt omit}} omit dropped levels from {cmd:b} and {cmd:vcov} parsing names of {cmd:b} (e.g. omitted variables in regression) {p_end}
+{synopt :{opth alpha(real)}} 1 - confidence level; default 0.05{p_end}
 
 {syntab :Test Only}
 {synopt :{opth slope(real)}} hypothesized linear trend (can specify undocumented option {opt power()} to find slope for given power internally){p_end}
 {synopt :{opth delta:true(str)}} name of vector with hypothesized trend (specify {opt slope()} for linear slope){p_end}
-{synopt :{opth alpha(real)}} 1 - confidence level; default 0.05{p_end}
 {synopt :{opt mata:save(str)}} save resulting mata object (default: PreTrendsResults){p_end}
 {synopt :{opt nocoefplot}} supress coefficient plot ({cmd:coefplot} package required by default){p_end}
 {synopt :{opt colorspec(str)}} the first color is taken as the color of the event study bars; the second and third are passed to {cmd:ciopts(lcolor())} for the linear trend and pre/post means.{p_end}
