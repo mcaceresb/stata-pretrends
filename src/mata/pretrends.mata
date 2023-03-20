@@ -54,7 +54,8 @@ struct PreTrendsResults scalar PreTrends(string scalar b,
                                          real scalar power,
                                          real scalar delta,
                                          string scalar deltatrue,
-                                         string scalar omit)
+                                         string scalar omit,
+                                         real scalar poweronly)
 {
     struct PreTrendsResults scalar results
     real scalar power_against_betatrue, power_against_0, likelihood_betatrue, likelihood_0, meanBetaPre, meanBetaPost
@@ -73,7 +74,8 @@ struct PreTrendsResults scalar PreTrends(string scalar b,
         results.deltatrue = rowshape(st_matrix(deltatrue), 1)
     }
 
-    thresh    = invnormal(1-results.alpha/2)
+    if ( poweronly ) return(results)
+    thresh = invnormal(1-results.alpha/2)
 
     // Extract the objets corresponding with the pre-period
     betaPreActual = results.betahat[results.prePeriodIndices]

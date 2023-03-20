@@ -10,7 +10,7 @@ This is the Stata version of the [R package of the same name](https://github.com
 If you’re not an R or Stata user, you may also be interested in the associated
 [Shiny app](https://github.com/jonathandroth/PretrendsPower).
 
-`version 0.2.0 19Mar2023` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
+`version 0.3.0 20Mar2023` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
 
 ## Installation
 
@@ -72,31 +72,59 @@ matrix, and the sections therein that correspond to the pre and post periods.
 By default, the package tries to use `e(b)` and `e(V)`, which would be
 populated after most estimation commands.
 
-Second, the user needs to specify a hypothesized trend. The package can
-compute the slope of a linear violation at a given power level via the
-`power()` option; it can use a user-specified slope direcly via the `slope()`
-option; or it can use an arbitrary trend via the `delta()` option.
+Second, the user has two options:
 
-With `power()`, it calculates the slope of a linear violation of
-parallel trends that a pre-trends test would detect a specified
-fraction of the time. (By detect, we mean that there is any significant
-pre-treatment coefficient.)
+1. The `power` sub-command calculates the slope of a linear violation
+  of parallel trends that a pre-trends test would detect a specified
+  fraction of the time. (By detect, we mean that there is any significant
+  pre-treatment coefficient.)
 
+2. Alternatively, the user can to specify a hypothesized trend and visualize
+  the results. The package use a user-specified slope directly via the `slope()`
+  option; it can use an arbitrary trend via the `delta()` option; or it can
+  compute the slope of a linear violation at a given power level internally
+  via the `power()` option (this last option is equivalent to using using the
+  `power` sub-command and inputing the resulting slope).
+
+Let's illustrate the first use case:
 ```stata
-pretrends, numpre(3) b(beta) v(sigma) power(0.5) coefplot
+pretrends power 0.5, numpre(3) b(beta) v(sigma)
+* Slope for 50% power =  .0520662
+
+return list
+* scalars:
+*               r(slope) =  .0520662478209672
+*               r(Power) =  .5
 ```
 
-Note the `coefplot` option, which requires the package of the sanem
-name. This is not required, but if specified will produce an event-study
-plot and add a user-hypothesized difference in trends.  In this case, we
-can see the linear trend against which pre-tests have 50 percent power.
+To visualize the linear trend against which pre-tests have 50 percent power:
+
+```stata
+pretrends, numpre(3) b(beta) v(sigma) slope(`r(slope)')
+```
 
 ![Power50](doc/plot50.png)
 
-In addition, several useful statistics about the power of the pre-test
-against the hypothesized trend are saved in `r()`.
+Note the `coefplot` package is required; if the coefplot package is not
+installed or not available, the user can add option `nocoefplot` to
+skip the visualization. In either case the event study data is saved in
+`r()`, along several useful statistics about the power of the pre-test
+against the hypothesized trend.
 
 ```stata
+* data for visualization
+matlist r(results)
+*              |         t    betahat         lb         ub  deltatrue  meanAft~g
+* -------------+------------------------------------------------------------------
+*           r1 |        -4   .0667031  -.1182677    .251674  -.1561987  -.0923171
+*           r2 |        -3  -.0077018  -.1587197   .1433162  -.1041325  -.0555576
+*           r3 |        -2  -.0307691  -.1388096   .0772715  -.0520662  -.0279117
+*           r4 |        -1          0          0          0          0          0
+*           r5 |         0   .0840307  -.0387567    .206818   .0520662   .0649147
+*           r6 |         1   .2424418   .0664168   .4184668   .1041325   .1208691
+*           r7 |         2    .219879   .0458768   .3938812   .1561987   .1694932
+*           r8 |         3   .1910925  -.0028194   .3850045    .208265   .2245753
+
 return list
 * scalars:
 *                  r(LR) =  .1057053243787036
@@ -112,6 +140,11 @@ return list
 *               r(delta) :  1 x 8
 ```
 
+- **r(results)** The data used to make the event plot. Note the column
+  `meanAfterPretesting`, which is also plotted, shows the expected value
+  of the coefficients conditional on passing the pre-test under the
+  hypothesized trend.
+
 - **r(Power)** The probability that we would find a significant pre-trend
   under the hypothesized pre-trend. (This is 0.50, up to numerical
   precision error, by construction in our example).
@@ -124,26 +157,15 @@ return list
   coefficients under the hypothesized trend relative to under parallel
   trends.
 
-Finally, `r(results)` contains the data used to make the
-event-plot. Note the column `meanAfterPretesting`, which is also
-plotted, shows the expected value of the coefficients conditional on
-passing the pre-test under the hypothesized trend.
+The package can also compute the above in one step:
 
 ```stata
+pretrends, numpre(3) b(beta) v(sigma) power(0.5) nocoefplot
 matlist r(results)
-*              |         t    betahat         lb         ub  deltatrue  meanAft~g
-* -------------+------------------------------------------------------------------
-*           r1 |        -4   .0667031  -.1182677    .251674  -.1561987  -.0923171
-*           r2 |        -3  -.0077018  -.1587197   .1433162  -.1041325  -.0555576
-*           r3 |        -2  -.0307691  -.1388096   .0772715  -.0520662  -.0279117
-*           r4 |        -1          0          0          0          0          0
-*           r5 |         0   .0840307  -.0387567    .206818   .0520662   .0649147
-*           r6 |         1   .2424418   .0664168   .4184668   .1041325   .1208691
-*           r7 |         2    .219879   .0458768   .3938812   .1561987   .1694932
-*           r8 |         3   .1910925  -.0028194   .3850045    .208265   .2245753
+return list
 ```
 
-Although our example has focused on a linear violation of parallel
+Last, although our example has focused on a linear violation of parallel
 trends, the package allows the user to input an arbitrary non-linear
 hypothesized trend. For instance, here is the event-plot and power
 analysis from a quadratic trend.
@@ -156,6 +178,18 @@ pretrends, numpre(3) b(beta) v(sigma) deltatrue(deltaquad) coefplot
 ![Power50](doc/plotQuad.png)
 
 ```stata
+matlist r(results)
+*              |         t    betahat         lb         ub  deltatrue  meanAft~g
+* -------------+------------------------------------------------------------------
+*           r1 |        -4   .0667031  -.1182677    .251674       .216   .1184861
+*           r2 |        -3  -.0077018  -.1587197   .1433162       .096    .040358
+*           r3 |        -2  -.0307691  -.1388096   .0772715       .024   .0040393
+*           r4 |        -1          0          0          0          0          0
+*           r5 |         0   .0840307  -.0387567    .206818       .024   .0093079
+*           r6 |         1   .2424418   .0664168   .4184668       .096    .072993
+*           r7 |         2    .219879   .0458768   .3938812       .216   .2004382
+*           r8 |         3   .1910925  -.0028194   .3850045       .384   .3617779
+
 return list
 * scalars:
 *                  r(LR) =  .4332635208743188

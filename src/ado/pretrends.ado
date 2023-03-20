@@ -1,4 +1,4 @@
-*! version 0.2.0 19Mar2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
+*! version 0.3.0 20Mar2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
 *! Power calculations and visualization for pre-trends tests (translation of R package)
 
 * xx add timeVec and reference period
@@ -6,28 +6,46 @@ capture program drop pretrends
 program pretrends, rclass
     version 15.1
 
-    local 0bak: copy local 0
-    syntax,                                ///
-    [                                      ///
-        b(str)                             /// name of coefficient vector; default is e(b)
-        Vcov(str)                          /// name of vcov matrix; default is e(V)
-        DELTAtrue(str)                     /// name of matrix with hypothesized trend
-        slope(passthru)                    /// hypothesized difference in trends
-        power(passthru)                    /// target power for pre-test: reject if any pre-treatment coef is significant at alpha
-        alpha(passthru)                    /// significance level
-                                           ///
-        omit                               /// Omit levels parsing b vector column names
-        NUMPREperiods(int 0)               /// number of pre-treatment periods
-        PREperiodindices(numlist)          /// pre-period indices
-        POSTperiodindices(numlist)         /// post-period indices
-                                           ///
-        MATAsave(str)                      /// Save resulting mata object
-        coefplot                           /// Coefficient  plot
-        cached                             /// Use cached results
-        colorspec(str asis)                /// special color handling
-        ciopt(str)                         ///
-        *                                  /// Options for coefplot
-    ]
+    local powermain power(passthru)            //  target power for pre-test: reject if any pre-treatment coef is significant at alpha
+    local poweropts b(str)                     /// name of coefficient vector; default is e(b)
+                    Vcov(str)                  /// name of vcov matrix; default is e(V)
+                                               ///
+                    omit                       /// Omit levels parsing b vector column names
+                    NUMPREperiods(int 0)       /// number of pre-treatment periods
+                    PREperiodindices(numlist)  /// pre-period indices
+                    POSTperiodindices(numlist) //  post-period indices
+    local fullopts  slope(passthru)            /// hypothesized difference in trends
+                    alpha(passthru)            /// significance level
+                    DELTAtrue(str)             /// name of matrix with hypothesized trend
+                                               ///
+                    MATAsave(str)              /// Save resulting mata object
+                    nocoefplot                 /// Coefficient  plot
+                    cached                     /// Use cached results
+                    colorspec(str asis)        /// special color handling
+                    ciopt(str)                 //
+
+    syntax [anything(everything)], [*]
+    gettoken anything power: anything
+    local anything `anything'
+    if ( `"`anything'"' == "power" ) {
+        confirm number `power'
+        local power power(`power')
+        local poweronly = 1
+        syntax [anything(everything)], ///
+        [                              ///
+            `poweropts'                ///
+        ]
+    }
+    else {
+        local poweronly = 0
+        syntax,         ///
+        [               ///
+            `powermain' ///
+            `poweropts' ///
+            `fullopts'  ///
+            *           /// Options for coefplot
+        ]
+    }
 
     if "`matasave'" == "" local results PreTrendsResults
     else local results: copy local matasave
@@ -81,22 +99,32 @@ program pretrends, rclass
                                   `numpreperiods',       ///
                                   "`preperiodindices'",  ///
                                   "`postperiodindices'", ///
-                                  `alpha', `power', `slope', "`deltatrue'", "`omit'")
+                                  `alpha', `power', `slope', "`deltatrue'", "`omit'", `poweronly')
         }
+    }
+
+    if ( `poweronly' ) {
+        tempname slope
+        mata st_numscalar(st_local("slope"), `results'.slope)
+        mata printf("Slope for %s power = %9.6g", strtrim(sprintf("%9.6g%%", 100 * `results'.power)), `results'.slope)
+        return scalar Power = `power'
+        return scalar slope = `slope'
+        mata mata drop `results'
+        exit 0
     }
 
     * Coef plot
     tempname plotmatrix cimatrix dummycoef deltamat meanBeta labels
-    if ( "`coefplot'" != "" ) {
+    if ( "`coefplot'" != "nocoefplot" ) {
         cap which coefplot
         if ( _rc ) {
-            disp as err "-coefplot- not found; required to plot CIs"
+            disp as err "-coefplot- not found; please install or use option -nocoefplot-"
             exit _rc
         }
     }
 
     mata {
-        if ( "`coefplot'" != "" ) {
+        if ( "`coefplot'" != "nocoefplot" ) {
             `plotmatrix' = `results'.ES
             `labels' = strofreal(`plotmatrix'[., 1]')
             st_matrix("`cimatrix'", `plotmatrix'[., 3::4]')
@@ -107,7 +135,7 @@ program pretrends, rclass
         }
     }
 
-    if ( "`coefplot'" != "" ) {
+    if ( "`coefplot'" != "nocoefplot" ) {
         matrix colnames `cimatrix'  = `cimatlab'
         matrix rownames `cimatrix'  = lb ub
         matrix colnames `dummycoef' = `cimatlab'

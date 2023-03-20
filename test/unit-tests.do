@@ -1,6 +1,8 @@
 version 15.1
 qui do test/unit-tests-basic.do
 
+xx mainly you just have to add tests
+
 capture program drop main
 program main
     unit_test basic_failures, xx
