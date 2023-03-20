@@ -79,12 +79,9 @@ Second, the user has two options:
   fraction of the time. (By detect, we mean that there is any significant
   pre-treatment coefficient.)
 
-2. Alternatively, the user can to specify a hypothesized trend and visualize
-  the results. The package use a user-specified slope directly via the `slope()`
-  option; it can use an arbitrary trend via the `delta()` option; or it can
-  compute the slope of a linear violation at a given power level internally
-  via the `power()` option (this last option is equivalent to using using the
-  `power` sub-command and inputing the resulting slope).
+2. Alternatively, the user can specify a hypothesized violations of parallel trends --- the package then creates a plot to visualize
+  the results, and reports various statistics related to the hypothesized difference in trend. The user can specify a hypothesized linear pre-trend via the `slope()`
+  option, or provide an arbitrary violation of parallel trends via the `delta()` option. 
 
 Let's illustrate the first use case:
 ```stata
