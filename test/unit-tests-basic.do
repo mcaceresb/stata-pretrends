@@ -6,10 +6,18 @@ program basic_checks
         st_matrix("sigma", PreTrendsExampleSigma())
     }
 
+    forvalues i = -50/50 {
+        local s = `i' / 10
+        disp "slope `s'"
+        qui pretrends, numpre(3) b(beta) v(sigma) slope(`s')
+        qui return list
+    }
+
     * local i = 20
     tempname s1
     forvalues i = 20/99 {
         local p = `i' / 100
+        disp "power `p'"
         qui pretrends power `p', numpre(3) b(beta) v(sigma)
         assert r(Power) == `p'
         mata `s1' = st_numscalar("r(slope)")
@@ -20,6 +28,7 @@ program basic_checks
     local i = 5
     forvalues i = 5(5)400 {
         local a = `i' / 1000
+        disp "alpha `a'"
         qui pretrends power 0.8, numpre(3) b(beta) v(sigma) alpha(`a')
         mata `s1' = st_numscalar("r(slope)")
         qui pretrends, pre(1/3) post(4/7) b(beta) v(sigma) slope(`r(slope)') alpha(`a')
