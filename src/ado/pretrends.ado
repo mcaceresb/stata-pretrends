@@ -1,4 +1,4 @@
-*! version 0.3.1 20Mar2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
+*! version 0.3.2 01Jun2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
 *! Power calculations and visualization for pre-trends tests (translation of R package)
 
 * xx add timeVec and reference period
