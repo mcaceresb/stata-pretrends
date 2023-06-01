@@ -194,7 +194,7 @@ real scalar function PreTrendsPower(struct PreTrendsResults scalar results)
     upper    = 8 * max(sqrt(diagonal(sigmaPre)))
 
     if ( PreTrendsPowerFun(lower, sigmaPre, thresh, relative) > results.power ) {
-        powerstr = strtrim(sprintf("%9.6g%%", results.power))
+        powerstr = strtrim(sprintf("%9.6g%%", 100 * results.power))
         errprintf("PreTrendsPower(): Power level %s too low; please increase power.\n", powerstr)
         _error(198)
     }
