@@ -72,7 +72,7 @@ Lead_D4_plus |   .0667032   .0897108     0.74   0.458    -.1099686    .2433749
 In this case, these coefficients come from a two-way fixed effects regression using `reghdfe`. However, the `pretrends` package will work with any package that produces an event-study from any
 asymptotically normal estimator, including
 [Callaway and Sant’Anna (2020)](https://www.sciencedirect.com/science/article/pii/S0304407620303948?dgcid=author)
-and [Sun and Abraham (2020)](https://www.sciencedirect.com/science/article/abs/pii/S030440762030378X), so long as the resulting estimates and coefficients are saved in `e(b)` and `e(V)`. If one is using a command that does not export an `e(b)` and `e(V)`, one can instead provide the coefficients and covariance matrix directly via the `beta()` and `sigma()` options.
+and [Sun and Abraham (2020)](https://www.sciencedirect.com/science/article/abs/pii/S030440762030378X), so long as the resulting estimates and coefficients are saved in `e(b)` and `e(V)`. If one is using a command that does not export an `e(b)` and `e(V)`, one can instead provide the coefficients and covariance matrix directly via the `beta()` and `vcov()` options.
 
 
 ### Using the package
@@ -85,7 +85,7 @@ The package has two subcommands:
   fraction of the time. (By detect, we mean that there is any significant
   pre-treatment coefficient.)
 
-2. Alternatively, the user can specify a hypothesized violations of parallel trends --- the package then creates a plot to visualize
+2. Alternatively, the user can specify a hypothesized violations of parallel trends&mdash;the package then creates a plot to visualize
   the results, and reports various statistics related to the hypothesized difference in trend. The user can specify a hypothesized linear pre-trend via the `slope()`
   option, or provide an arbitrary violation of parallel trends via the `delta()` option. 
 
@@ -102,7 +102,7 @@ return list
 *               r(Power) =  .5
 ```
 
-In the command above, the option `pre(1/3)` tells the package that the pre-treatment event-study coefficients are in positions 1 through 3 in our regression results. (The package assumes that the period before the event-study is normalized to zero and omitted from the regression.) Likewise, the option `post(1/4)` tells the package that the post-treatment coefficients are in positions 4 through 7. The results of the command tells us that if there was a linear violation of parallel trends with slope 0.049, then we would have 50% power to detect it (where we say it's "detected" if there is a significant pre-trend coefficient). If we want wanted a different power threshold, say 80%, we would change `power 0.5` to `power 0.8` in the command above.  
+In the command above, the option `pre(1/3)` tells the package that the pre-treatment event-study coefficients are in positions 1 through 3 in our regression results. (The package assumes that the period before the event-study is normalized to zero and omitted from the regression.) Likewise, the option `post(4/7)` tells the package that the post-treatment coefficients are in positions 4 through 7. The results of the command tells us that if there was a linear violation of parallel trends with slope 0.049, then we would have 50% power to detect it (where we say it's "detected" if there is a significant pre-trend coefficient). If we want wanted a different power threshold, say 80%, we would change `power 0.5` to `power 0.8` in the command above.  
 
 
 Next, we illustrate how to visualize violations of parallel trends using the package's second subcommand. For simplicitly, lets visualize the linear trend against which pre-tests have 50 percent power that we just calculated. This is just for illustration --- you can visualize any violation that you want, and should choose an economically relevant one. To do this, we run the command:
@@ -137,7 +137,7 @@ matlist r(results)
 
 return list
 * scalars:
-*                  r(LR) =  .1016996725963556
+*               r(LR) =  .1016996725963556
 *               r(Bayes) =  .5690176868657252
 *               r(Power) =  .5000000000010103
 *               r(slope) =  .0494932155202119
