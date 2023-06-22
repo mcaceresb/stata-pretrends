@@ -1,3 +1,5 @@
 standalone
 src/releases
 test/testing.*
+.DS_Store
+src/.DS_Store

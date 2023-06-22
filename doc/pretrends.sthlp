@@ -59,7 +59,7 @@ At least one of {opt numpre()} or {opt pre()} and {opt post()} are required opti
 {title:Description}
 
 {pstd}
-See the {browse "https://github.com/mcaceresb/stata-pretrends#readme":online examples} for details or refer to the examples below.
+See the {browse "https://github.com/mcaceresb/stata-pretrends#readme":package Github page} for detailed examples, including how to import results from common packages such as reghdfe. Below are some stylized examples using saved results from the example on the Github page.
 
 {marker examples}{...}
 {title:Example 1: Slope with power}
