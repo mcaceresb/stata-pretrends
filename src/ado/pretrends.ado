@@ -231,10 +231,13 @@ program PreTrendsSanityChecks
 
     tempname bb VV
     if ( "`b'" == "" ) {
+        if ( "`vcov'" != "" ) {
+            disp as txt "{bf:warning:} option vcov() detected without option b()"
+        }
         local b e(b)
         cap confirm matrix e(b)
         if ( _rc ) {
-            disp as err "Last estimation coefficients not found; please specify vector."
+            disp as err "Last estimation coefficients not found; please specify vector via b()."
             exit 198
         }
         matrix `bb' = e(b)
@@ -248,10 +251,13 @@ program PreTrendsSanityChecks
     }
 
     if ( "`vcov'" == "" ) {
+        if ( "`b'" != "" ) {
+            disp as txt "{bf:warning:} option b() detected without option vcov()"
+        }
         local vcov e(V)
         cap confirm matrix e(V)
         if ( _rc ) {
-            disp as err "Last estimation vcov matrix not found; please specify matrix."
+            disp as err "Last estimation vcov matrix not found; please specify matrix via vcov()."
             exit 198
         }
         matrix `VV' = e(V)

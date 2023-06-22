@@ -105,7 +105,7 @@ return list
 In the command above, the option `pre(1/3)` tells the package that the pre-treatment event-study coefficients are in positions 1 through 3 in our regression results. (The package assumes that the period before the event-study is normalized to zero and omitted from the regression.) Likewise, the option `post(4/7)` tells the package that the post-treatment coefficients are in positions 4 through 7. The results of the command tells us that if there was a linear violation of parallel trends with slope 0.049, then we would have 50% power to detect it (where we say it's "detected" if there is a significant pre-trend coefficient). If we want wanted a different power threshold, say 80%, we would change `power 0.5` to `power 0.8` in the command above.  
 
 
-Next, we illustrate how to visualize violations of parallel trends using the package's second subcommand. For simplicitly, lets visualize the linear trend against which pre-tests have 50 percent power that we just calculated. This is just for illustration --- you can visualize any violation that you want, and should choose an economically relevant one. To do this, we run the command:
+Next, we illustrate how to visualize violations of parallel trends using the package's second subcommand. For simplicitly, lets visualize the linear trend against which pre-tests have 50 percent power that we just calculated. This is just for illustration—you can visualize any violation that you want, and should choose an economically relevant one. To do this, we run the command:
 
 ```stata
 pretrends, numpre(3) b(beta) v(sigma) slope(`r(slope)')
@@ -199,7 +199,7 @@ matlist r(results)
 
 return list
 * scalars:
-*			         r(LR) =  .3962795305253372
+*			   r(LR)    =  .3962795305253372
 *              r(Bayes) =  .3384376031301103
 *              r(Power) =  .7026124047271576
 *
