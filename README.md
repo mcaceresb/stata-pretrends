@@ -43,7 +43,7 @@ this:
 We first load the dataset used by He and Wang. 
 
 ```stata
-use "https://media.githubusercontent.com/media/jonathandroth/stata-pretrends/main/data/workfile_AEJ.dta", clear
+use "https://media.githubusercontent.com/media/mcaceresb/stata-pretrends/main/data/workfile_AEJ.dta", clear
 ```
 
 We then run their regression specification. 
