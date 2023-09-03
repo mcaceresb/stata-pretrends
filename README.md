@@ -10,7 +10,7 @@ This is the Stata version of the [R package of the same name](https://github.com
 If you’re not an R or Stata user, you may also be interested in the associated
 [Shiny app](https://github.com/jonathandroth/PretrendsPower).
 
-`version 0.3.2 01Jun2023` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
+`version 0.3.3 03Sep2023` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
 
 ## Installation
 
@@ -108,12 +108,16 @@ In the command above, the option `pre(1/3)` tells the package that the pre-treat
 Next, we illustrate how to visualize violations of parallel trends using the package's second subcommand. For simplicitly, lets visualize the linear trend against which pre-tests have 50 percent power that we just calculated. This is just for illustration—you can visualize any violation that you want, and should choose an economically relevant one. To do this, we run the command:
 
 ```stata
+matrix sigma = e(V)
+matrix beta  = e(b)
+matrix beta  = beta[., 1..7]
+matrix sigma = sigma[1..7, 1..7]
 pretrends, numpre(3) b(beta) v(sigma) slope(`r(slope)')
 ```
 
 ![Power50](doc/plot50.png)
 
-This tells Stata to visualize a linear violation of parallel trends with slope `r(slope)`, i.e. the value calculated by the previous command (0.049). If you wanted to visualize a linear violation with slope 5, you'd just specify `slope(5)`. The resulting plot super-imposes the conjectured linear violation of parallel trends on the event-plot in red. It also shows in dashed blue what we'd expect the coefficients to look like on average *conditional on not finding a significant pre-trend* if in fact that truth was the hypothesized red line. In the plot above, both the red line and blue line are contained within all of the confidence intervals (with the exception of one pre-period for the red line), so the hypothesized trend seems somewhat plausible. 
+This tells Stata to visualize a linear violation of parallel trends with slope `r(slope)`, i.e. the value calculated by the previous command (0.049). If you wanted to visualize a linear violation with slope 5, you'd just specify `slope(5)`. (Note when specifying `numpre()` the vector `b()` and the matrix `v()` must only contain the relevant coefficients.) The resulting plot super-imposes the conjectured linear violation of parallel trends on the event-plot in red. It also shows in dashed blue what we'd expect the coefficients to look like on average *conditional on not finding a significant pre-trend* if in fact that truth was the hypothesized red line. In the plot above, both the red line and blue line are contained within all of the confidence intervals (with the exception of one pre-period for the red line), so the hypothesized trend seems somewhat plausible. 
 
 
 Note that to create the plot above, the `coefplot` package is required; if the coefplot package is not

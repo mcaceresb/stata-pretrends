@@ -1,3 +1,12 @@
+* From the README:
+* use "https://media.githubusercontent.com/media/mcaceresb/stata-pretrends/main/data/workfile_AEJ.dta", clear
+* reghdfe l_poor_reg_rate Lead_D4_plus Lead_D3 Lead_D2 D0 Lag_D1 Lag_D2 Lag_D3_plus, absorb(v_id year) cluster(v_id)
+* matrix sigma = e(V)
+* matrix beta  = e(b)
+* matrix beta  = beta[., 1..7]
+* matrix sigma = sigma[1..7, 1..7]
+
+* Cached:
 mata {
     st_matrix("beta",  PreTrendsExampleBeta())
     st_matrix("sigma", PreTrendsExampleSigma())
