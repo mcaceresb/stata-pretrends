@@ -10,7 +10,7 @@ This is the Stata version of the [R package of the same name](https://github.com
 If you’re not an R or Stata user, you may also be interested in the associated
 [Shiny app](https://github.com/jonathandroth/PretrendsPower).
 
-`version 0.4.0 06Oct2023` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
+`version 0.4.1 06Oct2023` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
 
 ## Installation
 
@@ -215,4 +215,4 @@ return list
 *               r(delta) :  1 x 8
 ```
 
-(Note when specifying `time()` and `ref()'` the vector `b()` and the matrix `v()` must start with the relevant coefficients. The number of pre-period  is taken to be the number of entries in the time vector strictly smaller than `ref()`, and the number of post-periods the number of entries strictly larger.)
+(Note when specifying `time()` and `ref()'` by default the vector `b()` and the matrix `v()` must start with the relevant coefficients. The number of pre-period  is taken to be the number of entries in the time vector strictly smaller than `ref()`, and the number of post-periods the number of entries strictly larger. `time()` and `ref()` may be combined with `pre()` and `post()`; `numpre()` may not be combined with either.)

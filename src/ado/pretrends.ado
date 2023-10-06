@@ -1,4 +1,4 @@
-*! version 0.4.0 06Oct2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
+*! version 0.4.1 06Oct2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
 *! Power calculations and visualization for pre-trends tests (translation of R package)
 
 capture program drop pretrends
@@ -72,7 +72,10 @@ program pretrends, rclass
     *
     *     timevector() and referenceperiod()
     *
-    * If numpreperiods() is specified, then
+    * 
+    * numpre() cannot be combined with either but time()/ref() and
+    * pre()/post() may be combined with each other.  If numpreperiods() is
+    * specified, then
     *
     *     preperiodindices(1 to numpreperiods)
     *     postperiodindices(numpreperiods+1 to length(e(b)))
@@ -333,6 +336,17 @@ program PreTrendsSanityChecks
         }
         if ( max(`rowsb', `colsb') < (`npre' + `npost') ) {
             disp as err "Coefficient vector must be at least # pre + # post"
+            exit 198
+        }
+    }
+
+    if ( (`numpreperiods' == 0) & `indices' & `timevec' ) {
+        local npreA:  list sizeof preperiodindices
+        local npostA: list sizeof postperiodindices
+        mata st_local("npreB",  strofreal(sum(strtoreal(tokens("`timevector'")) :< `referenceperiod')))
+        mata st_local("npostB", strofreal(sum(strtoreal(tokens("`timevector'")) :> `referenceperiod')))
+        if ( (`npreA' != `npreB') | (`npostA' != `npostB') ) {
+            disp as err "Shape implied by pre()/post() does not match shape implied by time()/ref()"
             exit 198
         }
     }

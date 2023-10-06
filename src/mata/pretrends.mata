@@ -131,6 +131,7 @@ struct PreTrendsResults scalar PreTrendsParse(string scalar b,
 {
     struct PreTrendsResults scalar results
     real vector selomit, sel
+    real scalar indices, timevec
 
     stata(sprintf("_ms_omit_info %s", b))
     selomit = selectindex(!editvalue(st_matrix("r(omit)"), omit == "", 0))
@@ -163,28 +164,45 @@ struct PreTrendsResults scalar PreTrendsParse(string scalar b,
         results.timeVec           = (results.prePeriodIndices, results.numPrePeriods+1, (results.postPeriodIndices:+1)) :- (results.numPrePeriods+2)
         results.referencePeriod   = -1
     }
-    else if ( (pre != "") & (post != "") ) {
-        results.prePeriodIndices  = strtoreal(tokens(pre))
-        results.postPeriodIndices = strtoreal(tokens(post))
-        sel                       = results.prePeriodIndices, results.postPeriodIndices
-        results.betahat           = rowshape(st_matrix(b), 1)[selomit][sel]
-        results.sigma             = st_matrix(V)[selomit, selomit][sel, sel]
-        results.numPrePeriods     = length(results.prePeriodIndices)
-        results.numPostPeriods    = length(results.postPeriodIndices)
-        results.prePeriodIndices  = 1..(results.numPrePeriods)
-        results.postPeriodIndices = (results.numPrePeriods+1)..length(results.betahat)
-        results.timeVec           = (results.prePeriodIndices, results.numPrePeriods+1, (results.postPeriodIndices:+1)) :- (results.numPrePeriods+2)
-        results.referencePeriod   = -1
-    }
-    else if ( (time != "") & (ref != "") ) {
-        results.betahat           = rowshape(st_matrix(b), 1)[selomit]
-        results.sigma             = st_matrix(V)[selomit, selomit]
-        results.timeVec           = strtoreal(tokens(time))
-        results.referencePeriod   = strtoreal(ref)
-        results.numPrePeriods     = sum(results.timeVec :< results.referencePeriod)
-        results.numPostPeriods    = sum(results.timeVec :> results.referencePeriod)
-        results.prePeriodIndices  = 1..results.numPrePeriods
-        results.postPeriodIndices = (results.numPrePeriods+1)..(results.numPrePeriods+results.numPostPeriods)
+    else {
+        indices = (pre != "") & (post != "")
+        timevec = (time != "") & (ref != "")
+        if ( indices & !timevec ) {
+            results.prePeriodIndices  = strtoreal(tokens(pre))
+            results.postPeriodIndices = strtoreal(tokens(post))
+            sel                       = results.prePeriodIndices, results.postPeriodIndices
+            results.betahat           = rowshape(st_matrix(b), 1)[selomit][sel]
+            results.sigma             = st_matrix(V)[selomit, selomit][sel, sel]
+            results.numPrePeriods     = length(results.prePeriodIndices)
+            results.numPostPeriods    = length(results.postPeriodIndices)
+            results.prePeriodIndices  = 1..(results.numPrePeriods)
+            results.postPeriodIndices = (results.numPrePeriods+1)..length(results.betahat)
+            results.timeVec           = (results.prePeriodIndices, results.numPrePeriods+1, (results.postPeriodIndices:+1)) :- (results.numPrePeriods+2)
+            results.referencePeriod   = -1
+        }
+        else if ( !indices & timevec ) {
+            results.betahat           = rowshape(st_matrix(b), 1)[selomit]
+            results.sigma             = st_matrix(V)[selomit, selomit]
+            results.timeVec           = strtoreal(tokens(time))
+            results.referencePeriod   = strtoreal(ref)
+            results.numPrePeriods     = sum(results.timeVec :< results.referencePeriod)
+            results.numPostPeriods    = sum(results.timeVec :> results.referencePeriod)
+            results.prePeriodIndices  = 1..results.numPrePeriods
+            results.postPeriodIndices = (results.numPrePeriods+1)..(results.numPrePeriods+results.numPostPeriods)
+        }
+        else if ( indices & timevec ) {
+            results.prePeriodIndices  = strtoreal(tokens(pre))
+            results.postPeriodIndices = strtoreal(tokens(post))
+            sel                       = results.prePeriodIndices, results.postPeriodIndices
+            results.betahat           = rowshape(st_matrix(b), 1)[selomit][sel]
+            results.sigma             = st_matrix(V)[selomit, selomit][sel, sel]
+            results.numPrePeriods     = length(results.prePeriodIndices)
+            results.numPostPeriods    = length(results.postPeriodIndices)
+            results.prePeriodIndices  = 1..(results.numPrePeriods)
+            results.postPeriodIndices = (results.numPrePeriods+1)..length(results.betahat)
+            results.timeVec           = strtoreal(tokens(time))
+            results.referencePeriod   = strtoreal(ref)
+        }
     }
 
     results.omit    = (omit != "")
