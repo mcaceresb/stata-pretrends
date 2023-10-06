@@ -1,4 +1,4 @@
-*! version 0.4.1 06Oct2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
+*! version 0.4.2 06Oct2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
 *! Power calculations and visualization for pre-trends tests (translation of R package)
 
 capture program drop pretrends
@@ -241,10 +241,35 @@ program PreTrendsSanityChecks
         exit 198
     }
 
+    if ((`numpreperiods' != 0) & "`timevector'`referenceperiod'" != "") {
+        disp as err "Specify only one of numpre() or time() and ref()"
+        exit 198
+    }
+
     local indices = ("`preperiodindices'" != "") & ("`postperiodindices'" != "")
     local timevec = ("`timevector'"       != "") & ("`referenceperiod'"   != "")
     if ((`numpreperiods' == 0) & (!`indices') & (!`timevec') ) {
         disp as err "Specify either numpre(), both pre() and post(), or both timevector() and referenceperiod()"
+        exit 198
+    }
+
+    if ( ("`preperiodindices'" != "") & ("`postperiodindices'" == "") ) {
+        disp as err "pre() can only be used with post()"
+        exit 198
+    }
+
+    if ( ("`preperiodindices'" == "") & ("`postperiodindices'" != "") ) {
+        disp as err "post() can only be used with pre()"
+        exit 198
+    }
+
+    if ( ("`timevector'" != "") & ("`referenceperiod'" == "") ) {
+        disp as err "time() can only be used with ref()"
+        exit 198
+    }
+
+    if ( ("`timevector'" == "") & ("`referenceperiod'" != "") ) {
+        disp as err "ref() can only be used with time()"
         exit 198
     }
 
