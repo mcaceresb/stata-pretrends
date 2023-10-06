@@ -1,7 +1,6 @@
-*! version 0.3.3 03Sep2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
+*! version 0.4.0 06Oct2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
 *! Power calculations and visualization for pre-trends tests (translation of R package)
 
-* xx add timeVec and reference period
 capture program drop pretrends
 program pretrends, rclass
     version 15.1
@@ -14,7 +13,9 @@ program pretrends, rclass
                     alpha(passthru)            /// significance level
                     NUMPREperiods(int 0)       /// number of pre-treatment periods
                     PREperiodindices(numlist)  /// pre-period indices
-                    POSTperiodindices(numlist) //  post-period indices
+                    POSTperiodindices(numlist) /// post-period indices
+                    TIMEvector(numlist)        /// time vector
+                    REFerenceperiod(str)       /// reference period
     local fullopts  slope(passthru)            /// hypothesized difference in trends
                     DELTAtrue(str)             /// name of matrix with hypothesized trend
                                                ///
@@ -67,14 +68,28 @@ program pretrends, rclass
     *
     *     preperiodindices() and postperiodindices()
     *
+    * OR
+    *
+    *     timevector() and referenceperiod()
+    *
     * If numpreperiods() is specified, then
     *
     *     preperiodindices(1 to numpreperiods)
     *     postperiodindices(numpreperiods+1 to length(e(b)))
     *
+    *     timevector(preperiodindices, numpreperiods+1, postperiodindices)
+    *     referenceperiod(numpreperiods+1)
+    *
+    * are assumed. If timevector() and referenceperiod() are specified, then
+    *
+    *     numpreperiods  = # time vector < referenceperiod
+    *     numpostperiods = # time vector > referenceperiod
+    *     preperiodindices(1 to numpreperiods)
+    *     postperiodindices(numpreperiods+1 to numpreperiods+numpostperiods+1)
+    *
     * are assumed.
 
-    local dopretrends = ("`b'`v'`alpha'`preperiodindices'`postperiodindices'`power'`slope'`deltatrue'" != "")
+    local dopretrends = ("`b'`v'`alpha'`preperiodindices'`postperiodindices'`timevector'`referenceperiod'`power'`slope'`deltatrue'" != "")
     local dopretrends = `dopretrends' | (`numpreperiods' != 0)
     if ( `dopretrends' & ("`cached'" != "") ) {
         disp as txt "{bf:warning:} cached results ignored if modifications are specified"
@@ -83,7 +98,7 @@ program pretrends, rclass
 
     if ( `dopretrends' | ("`cached'" == "") ) {
         PreTrendsSanityChecks, b(`b') vcov(`vcov') deltatrue(`deltatrue') `alpha' `power' `slope' ///
-            numpre(`numpreperiods') pre(`preperiodindices') post(`postperiodindices')
+            numpre(`numpreperiods') pre(`preperiodindices') post(`postperiodindices') time(`timevector') ref(`referenceperiod')
     }
     else {
         local alpha = 0.05
@@ -99,6 +114,8 @@ program pretrends, rclass
                                   `numpreperiods',       ///
                                   "`preperiodindices'",  ///
                                   "`postperiodindices'", ///
+                                  "`timevector'",        ///
+                                  "`referenceperiod'",   ///
                                   `alpha', `power', `slope', "`deltatrue'", "`omit'", `poweronly')
         }
     }
@@ -175,6 +192,8 @@ program PreTrendsSanityChecks
         NUMPREperiods(int 0)       /// number of pre-treatment periods
         PREperiodindices(numlist)  /// pre-period indices
         POSTperiodindices(numlist) /// post-period indices
+        TIMEvector(numlist)        /// time vector
+        REFerenceperiod(str)       /// reference period
     ]
 
     if ( "`slope'`power'`deltatrue'" == "" ) {
@@ -219,8 +238,10 @@ program PreTrendsSanityChecks
         exit 198
     }
 
-    if ((`numpreperiods' == 0) & (("`preperiodindices'" == "") | ("`postperiodindices'" == "")) ) {
-        disp as err "Specify either numpre() or both pre() and post()"
+    local indices = ("`preperiodindices'" != "") & ("`postperiodindices'" != "")
+    local timevec = ("`timevector'"       != "") & ("`referenceperiod'"   != "")
+    if ((`numpreperiods' == 0) & (!`indices') & (!`timevec') ) {
+        disp as err "Specify either numpre(), both pre() and post(), or both timevector() and referenceperiod()"
         exit 198
     }
 
@@ -285,9 +306,31 @@ program PreTrendsSanityChecks
         exit 198
     }
 
-    if ( (`numpreperiods' == 0) & ("`preperiodindices'" != "") & ("`postperiodindices'" != "") ) {
+    if ( (`numpreperiods' == 0) & `indices' ) {
         local npre:  list sizeof preperiodindices
         local npost: list sizeof postperiodindices
+        if ( max(`rowsb', `colsb') < (`npre' + `npost') ) {
+            disp as err "Coefficient vector must be at least # pre + # post"
+            exit 198
+        }
+    }
+
+    if ( (`numpreperiods' == 0) & `timevec' ) {
+        cap confirm number `referenceperiod'
+        if ( _rc ) {
+            disp as err "ref() reference period must be a number"
+            exit 198
+        }
+        mata st_local("npre",  strofreal(sum(strtoreal(tokens("`timevector'")) :< `referenceperiod')))
+        mata st_local("npost", strofreal(sum(strtoreal(tokens("`timevector'")) :> `referenceperiod')))
+        if ( `npre' <= 0 ) {
+            disp as err "No time periods in time vector less than referenceperiod `referenceperiod' found"
+            exit 198
+        }
+        if ( `npost' <= 0 ) {
+            disp as err "No time periods in time vector greater than referenceperiod `referenceperiod' found"
+            exit 198
+        }
         if ( max(`rowsb', `colsb') < (`npre' + `npost') ) {
             disp as err "Coefficient vector must be at least # pre + # post"
             exit 198

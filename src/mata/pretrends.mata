@@ -34,7 +34,7 @@ struct PreTrendsResults {
     real vector betahat
     real matrix sigma
     real vector timeVec
-    real vector referencePeriod
+    real scalar referencePeriod
     real scalar numPrePeriods
     real scalar numPostPeriods
     real vector prePeriodIndices
@@ -50,6 +50,8 @@ struct PreTrendsResults scalar PreTrends(string scalar b,
                                          real scalar numPrePeriods,
                                          string scalar pre,
                                          string scalar post,
+                                         string scalar time,
+                                         string scalar ref,
                                          real scalar alpha,
                                          real scalar power,
                                          real scalar delta,
@@ -64,7 +66,7 @@ struct PreTrendsResults scalar PreTrends(string scalar b,
     real matrix sigmaPre, CI
 
     // Setup
-    results = PreTrendsParse(b, V, numPrePeriods, pre, post, alpha, power, delta, omit)
+    results = PreTrendsParse(b, V, numPrePeriods, pre, post, time, ref, alpha, power, delta, omit)
     if ( deltatrue == "" ) {
         results.slope     = results.delta == .? PreTrendsPower(results): results.delta
         results.deltatrue = results.slope * (results.timeVec :- results.referencePeriod)
@@ -120,6 +122,8 @@ struct PreTrendsResults scalar PreTrendsParse(string scalar b,
                                               real scalar numPrePeriods,
                                               string scalar pre,
                                               string scalar post,
+                                              string scalar time,
+                                              string scalar ref,
                                               real scalar alpha,
                                               real scalar power,
                                               real scalar delta,
@@ -150,31 +154,43 @@ struct PreTrendsResults scalar PreTrendsParse(string scalar b,
 
     results = PreTrendsResults()
     if ( numPrePeriods > 0 ) {
-        results.betahat = rowshape(st_matrix(b), 1)[selomit]
-        results.sigma   = st_matrix(V)[selomit, selomit]
+        results.betahat           = rowshape(st_matrix(b), 1)[selomit]
+        results.sigma             = st_matrix(V)[selomit, selomit]
         results.numPrePeriods     = numPrePeriods
         results.numPostPeriods    = length(results.betahat)-numPrePeriods
         results.prePeriodIndices  = 1..numPrePeriods
         results.postPeriodIndices = (numPrePeriods+1)..length(results.betahat)
+        results.timeVec           = (results.prePeriodIndices, results.numPrePeriods+1, (results.postPeriodIndices:+1)) :- (results.numPrePeriods+2)
+        results.referencePeriod   = -1
     }
-    else {
+    else if ( (pre != "") & (post != "") ) {
         results.prePeriodIndices  = strtoreal(tokens(pre))
         results.postPeriodIndices = strtoreal(tokens(post))
-        sel = results.prePeriodIndices, results.postPeriodIndices
-        results.betahat = rowshape(st_matrix(b), 1)[selomit][sel]
-        results.sigma   = st_matrix(V)[selomit, selomit][sel, sel]
-        results.numPrePeriods  = length(results.prePeriodIndices)
-        results.numPostPeriods = length(results.postPeriodIndices)
+        sel                       = results.prePeriodIndices, results.postPeriodIndices
+        results.betahat           = rowshape(st_matrix(b), 1)[selomit][sel]
+        results.sigma             = st_matrix(V)[selomit, selomit][sel, sel]
+        results.numPrePeriods     = length(results.prePeriodIndices)
+        results.numPostPeriods    = length(results.postPeriodIndices)
         results.prePeriodIndices  = 1..(results.numPrePeriods)
         results.postPeriodIndices = (results.numPrePeriods+1)..length(results.betahat)
+        results.timeVec           = (results.prePeriodIndices, results.numPrePeriods+1, (results.postPeriodIndices:+1)) :- (results.numPrePeriods+2)
+        results.referencePeriod   = -1
+    }
+    else if ( (time != "") & (ref != "") ) {
+        results.betahat           = rowshape(st_matrix(b), 1)[selomit]
+        results.sigma             = st_matrix(V)[selomit, selomit]
+        results.timeVec           = strtoreal(tokens(time))
+        results.referencePeriod   = strtoreal(ref)
+        results.numPrePeriods     = sum(results.timeVec :< results.referencePeriod)
+        results.numPostPeriods    = sum(results.timeVec :> results.referencePeriod)
+        results.prePeriodIndices  = 1..results.numPrePeriods
+        results.postPeriodIndices = (results.numPrePeriods+1)..(results.numPrePeriods+results.numPostPeriods)
     }
 
     results.omit    = (omit != "")
     results.alpha   = alpha
     results.power   = power
     results.delta   = delta
-    results.timeVec = (results.prePeriodIndices, results.numPrePeriods+1, (results.postPeriodIndices:+1)) :- (results.numPrePeriods+2)
-    results.referencePeriod = -1
 
     return(results)
 }

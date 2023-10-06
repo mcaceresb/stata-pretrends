@@ -10,7 +10,7 @@ This is the Stata version of the [R package of the same name](https://github.com
 If you’re not an R or Stata user, you may also be interested in the associated
 [Shiny app](https://github.com/jonathandroth/PretrendsPower).
 
-`version 0.3.3 03Sep2023` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
+`version 0.4.0 06Oct2023` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
 
 ## Installation
 
@@ -181,7 +181,7 @@ analysis from a quadratic trend.
 
 ```stata
 mata st_matrix("deltaquad", 0.024 * ((-4::3) :- (-1)):^2)
-pretrends, pre(1/3) post(4/7) deltatrue(deltaquad) coefplot
+pretrends, time(-4(1)3) ref(-1) deltatrue(deltaquad) coefplot
 ```
 
 ![Power50](doc/plotQuad.png)
@@ -214,3 +214,5 @@ return list
 *             r(results) :  8 x 6
 *               r(delta) :  1 x 8
 ```
+
+(Note when specifying `time()` and `ref()'` the vector `b()` and the matrix `v()` must start with the relevant coefficients. The number of pre-period  is taken to be the number of entries in the time vector strictly smaller than `ref()`, and the number of post-periods the number of entries strictly larger.)
