@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.4.2 06Oct2023}{...}
+{* *! version 0.4.3 09Oct2023}{...}
 {viewerdialog pretrends "dialog pretrends"}{...}
 {vieweralsosee "[R] pretrends" "mansection R pretrends"}{...}
 {viewerjumpto "Syntax" "pretrends##syntax"}{...}
@@ -43,6 +43,7 @@ At least one of {opt numpre()}, {opt pre()} and {opt post()}, or {opt time()} an
 {synopt :{opth post:periodindex(numlist)}} post-period indices (required or specify numpreperiods() or time()/ref()){p_end}
 {synopt :{opth time:vector(numlist)}} time vector to use (required or specify numpreperiods() or pre()/post()){p_end}
 {synopt :{opth ref:erenceperiod(numlist)}} reference period for time vec (required or specify numpreperiods() or pre()/post()){p_end}
+{synopt :{opth customreference}} allows ref() to be in pre or post when both time()/ref() and pre()/post() are specified{p_end}
 {synopt :{opt omit}} omit dropped levels from {cmd:b} and {cmd:vcov} parsing names of {cmd:b} (e.g. omitted variables in regression) {p_end}
 {synopt :{opth alpha(real)}} 1 - confidence level; default 0.05{p_end}
 

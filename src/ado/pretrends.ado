@@ -1,6 +1,7 @@
-*! version 0.4.2 06Oct2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
+*! version 0.4.3 09Oct2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
 *! Power calculations and visualization for pre-trends tests (translation of R package)
 
+* xx need more unit testing for pre/post and time/ref combinations
 capture program drop pretrends
 program pretrends, rclass
     version 15.1
@@ -16,6 +17,8 @@ program pretrends, rclass
                     POSTperiodindices(numlist) /// post-period indices
                     TIMEvector(numlist)        /// time vector
                     REFerenceperiod(str)       /// reference period
+                    customreference            /// ignored unless both pre/post and time/ref are specified.
+                                               /// allows the reference period to be in pre or post.
     local fullopts  slope(passthru)            /// hypothesized difference in trends
                     DELTAtrue(str)             /// name of matrix with hypothesized trend
                                                ///
@@ -72,7 +75,7 @@ program pretrends, rclass
     *
     *     timevector() and referenceperiod()
     *
-    * 
+    *
     * numpre() cannot be combined with either but time()/ref() and
     * pre()/post() may be combined with each other.  If numpreperiods() is
     * specified, then
@@ -90,7 +93,8 @@ program pretrends, rclass
     *     preperiodindices(1 to numpreperiods)
     *     postperiodindices(numpreperiods+1 to numpreperiods+numpostperiods+1)
     *
-    * are assumed.
+    * are assumed. You can force pre/post to be taken as reference and for time/ref
+    * via the -customreference- option
 
     local dopretrends = ("`b'`v'`alpha'`preperiodindices'`postperiodindices'`timevector'`referenceperiod'`power'`slope'`deltatrue'" != "")
     local dopretrends = `dopretrends' | (`numpreperiods' != 0)
@@ -100,8 +104,10 @@ program pretrends, rclass
     }
 
     if ( `dopretrends' | ("`cached'" == "") ) {
-        PreTrendsSanityChecks, b(`b') vcov(`vcov') deltatrue(`deltatrue') `alpha' `power' `slope' ///
-            numpre(`numpreperiods') pre(`preperiodindices') post(`postperiodindices') time(`timevector') ref(`referenceperiod')
+        PreTrendsSanityChecks, b(`b') vcov(`vcov') deltatrue(`deltatrue') ///
+            `alpha' `power' `slope' numpre(`numpreperiods')               ///
+            pre(`preperiodindices') post(`postperiodindices')             ///
+            time(`timevector') ref(`referenceperiod') `customreference'
     }
     else {
         local alpha = 0.05
@@ -197,6 +203,8 @@ program PreTrendsSanityChecks
         POSTperiodindices(numlist) /// post-period indices
         TIMEvector(numlist)        /// time vector
         REFerenceperiod(str)       /// reference period
+        customreference            /// ignored unless both pre/post and time/ref are specified.
+                                   /// allows the reference period to be in pre or post.
     ]
 
     if ( "`slope'`power'`deltatrue'" == "" ) {
@@ -365,7 +373,7 @@ program PreTrendsSanityChecks
         }
     }
 
-    if ( (`numpreperiods' == 0) & `indices' & `timevec' ) {
+    if ( (`numpreperiods' == 0) & `indices' & `timevec' & ("`customreference'" == "") ) {
         local npreA:  list sizeof preperiodindices
         local npostA: list sizeof postperiodindices
         mata st_local("npreB",  strofreal(sum(strtoreal(tokens("`timevector'")) :< `referenceperiod')))
