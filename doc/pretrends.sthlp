@@ -1,5 +1,5 @@
 {smcl}
-{* *! version 0.4.3 09Oct2023}{...}
+{* *! version 0.4.4 04Apr2024}{...}
 {viewerdialog pretrends "dialog pretrends"}{...}
 {vieweralsosee "[R] pretrends" "mansection R pretrends"}{...}
 {viewerjumpto "Syntax" "pretrends##syntax"}{...}

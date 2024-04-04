@@ -1,4 +1,4 @@
-*! version 0.4.3 09Oct2023 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
+*! version 0.4.4 04Apr2024 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
 *! Power calculations and visualization for pre-trends tests (translation of R package)
 
 * xx need more unit testing for pre/post and time/ref combinations
@@ -287,7 +287,10 @@ program PreTrendsSanityChecks
     }
 
     tempname bb VV
-    if ( "`b'" == "" ) {
+    local withoutb = ( "`b'" == "" )
+    local withoutV = ( "`vcov'" == "" )
+
+    if `withoutb' {
         if ( "`vcov'" != "" ) {
             disp as txt "{bf:warning:} option vcov() detected without option b()"
         }
@@ -307,7 +310,7 @@ program PreTrendsSanityChecks
         local colsb = colsof(`b')
     }
 
-    if ( "`vcov'" == "" ) {
+    if `withoutV' {
         if ( "`b'" != "" ) {
             disp as txt "{bf:warning:} option b() detected without option vcov()"
         }
