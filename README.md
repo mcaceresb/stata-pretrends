@@ -21,7 +21,7 @@ trends on an event-study plot.
 
 If you’re worried about violations of parallel trends, you might also
 consider the sensitivity analysis provided in the [HonestDiD
-package](https://github.com/asheshrambachan/HonestDiD?tab=readme-ov-file#honestdid).
+package](https://github.com/mcaceresb/stata-honestdid/?tab=readme-ov-file#example-usage----medicaid-expansions).
 Rather than relying on the significance of a pre-test, the HonestDiD approach
 imposes that the post-treatment violations of parallel trends are not “too
 large” relative to the pre-treatment violations. It then forms confidence
