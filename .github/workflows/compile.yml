@@ -17,17 +17,17 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup GNU Fortran
         uses: modflowpy/install-gfortran-action@v1
-      - name: compile x86_64
-        run: |
-          make all MVNORM_OUT=src/build/pretrends_mvnorm_macosx86_64.plugin ARCH="-arch x86_64"
-          shasum src/build/pretrends_mvnorm_macosx86_64.plugin
-          otool -L src/build/pretrends_mvnorm_macosx86_64.plugin
-          rm -f src/plugin/mvtdstpack.o
       - name: compile arm64
         run: |
           make all MVNORM_OUT=src/build/pretrends_mvnorm_macosxarm64.plugin ARCH="-arch arm64"
           shasum src/build/pretrends_mvnorm_macosxarm64.plugin
           otool -L src/build/pretrends_mvnorm_macosxarm64.plugin
+          rm -f src/plugin/mvtdstpack.o
+      - name: compile x86_64
+        run: |
+          make all MVNORM_OUT=src/build/pretrends_mvnorm_macosx86_64.plugin ARCH="-arch x86_64"
+          shasum src/build/pretrends_mvnorm_macosx86_64.plugin
+          otool -L src/build/pretrends_mvnorm_macosx86_64.plugin
           rm -f src/plugin/mvtdstpack.o
       - name: combine plugins
         run: |
