@@ -1,11 +1,11 @@
 name: compile-nix-plugins
 on:
   push:
-    branches: [ main ]
+    branches: [ main, issues_mvnormalcv ]
     paths:
       - 'src/plugin'
   pull_request:
-    branches: [ main ]
+    branches: [ main, issues_mvnormalcv ]
     paths:
       - 'src/plugin'
   workflow_dispatch:
