@@ -16,10 +16,14 @@ mata:
 // numPrePeriods = `numpreperiods'
 // pre           = "`preperiodindices'"
 // post          = "`postperiodindices'"
+// time          = "`timevector'"
+// ref           = "`referenceperiod'"
 // alpha         = `alpha'
 // power         = `power'
-// delta         = `delta'
+// delta         = `slope'
+// deltatrue     = "`deltatrue'"
 // omit          = "`omit'"
+// poweronly     = `poweronly'
 
 struct PreTrendsResults {
     // Problem results

@@ -84,6 +84,11 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
     real scalar i, j, p, n
     real vector correl, sd
 
+    n = length(mu)
+    if ( n < 2 ) {
+        return(normal((upper - mu) / sqrt(sigma)) - normal((lower - mu) / sqrt(sigma)))
+    }
+
     // Check plugin
     // ------------
 
@@ -98,10 +103,9 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
         // NB: mvtnorm uses 1e-3 as default tolerance tho
         if ( (args() < 5) | (missing(df))     ) df     = 0
         if ( (args() < 7) | (missing(abseps)) ) abseps = epsilon(1)^(1/5)
-        if ( (args() < 6) | (missing(maxpts)) ) maxpts = max((25000, ceil(length(mu)/abseps)))
+        if ( (args() < 6) | (missing(maxpts)) ) maxpts = max((25000, ceil(n/abseps)))
         if ( (args() < 8) | (missing(releps)) ) releps = 0
 
-        n  = length(mu)
         sd = sqrt(diagonal(sigma))'
         correl = J(1, n * (n - 1) / 2, .)
         for (i = 1; i <= n; i++) {
@@ -151,6 +155,9 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
                 }
                 st_numscalar("__pretrends_mvnorm_rc", 17290 + st_numscalar("__pretrends_mvnorm_INFORM"))
             }
+        }
+        else {
+            errprintf("WARNING: Unknown error; falling back on mata.\n")
         }
     }
     else {

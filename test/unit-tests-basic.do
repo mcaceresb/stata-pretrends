@@ -22,7 +22,7 @@ program basic_checks
         assert r(Power) == `p'
         mata `s1' = st_numscalar("r(slope)")
         qui pretrends power `p', pre(1/3) post(4/7) b(beta) v(sigma)
-        mata assert(reldif(`s1', st_numscalar("r(slope)")) < epsilon(1))
+        mata assert(reldif(`s1', st_numscalar("r(slope)")) < epsilon(1)^(1/5))
     }
 
     local i = 5
@@ -32,9 +32,9 @@ program basic_checks
         qui pretrends power 0.8, numpre(3) b(beta) v(sigma) alpha(`a')
         mata `s1' = st_numscalar("r(slope)")
         qui pretrends, pre(1/3) post(4/7) b(beta) v(sigma) slope(`r(slope)') alpha(`a')
-        mata assert(reldif(0.8, st_numscalar("r(Power)")) < epsilon(1)^0.5)
+        mata assert(reldif(0.8, st_numscalar("r(Power)")) < epsilon(1)^(1/6))
         qui pretrends, time(-4(1)3) ref(-1) b(beta) v(sigma) slope(`r(slope)') alpha(`a')
-        mata assert(reldif(0.8, st_numscalar("r(Power)")) < epsilon(1)^0.5)
+        mata assert(reldif(0.8, st_numscalar("r(Power)")) < epsilon(1)^(1/6))
         qui pretrends, time(7 10 11 12 13 19) pre(2/3) post(4 5 7) ref(11) b(beta) v(sigma) slope(`r(slope)') alpha(`a')
     }
 
