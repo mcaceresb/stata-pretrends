@@ -20,11 +20,13 @@ jobs:
           make all MVNORM_OUT=src/build/pretrends_mvnorm_macosx86_64.plugin ARCH="-arch x86_64"
           shasum src/build/pretrends_mvnorm_macosx86_64.plugin
           otool -L src/build/pretrends_mvnorm_macosx86_64.plugin
+          rm -f src/plugin/mvtdstpack.o
       - name: compile arm64
         run: |
           make all MVNORM_OUT=src/build/pretrends_mvnorm_macosxarm64.plugin ARCH="-arch arm64"
           shasum src/build/pretrends_mvnorm_macosxarm64.plugin
           otool -L src/build/pretrends_mvnorm_macosxarm64.plugin
+          rm -f src/plugin/mvtdstpack.o
       - name: combine plugins
         run: |
           rm -f src/build/pretrends_mvnorm_macosx.plugin
@@ -48,6 +50,8 @@ jobs:
       - name: Compile Linux
         run: |
           make all
+          sha1sum src/build/pretrends_mvnorm_unix.plugin
+          rm -f src/plugin/mvtdstpack.o
       - name: Commit plugin
         run: |
           git config user.name github-actions
