@@ -7,7 +7,7 @@ ifeq ($(OS),Windows_NT)
 	GFORTRAN = x86_64-w64-mingw32-gfortran.exe
 	MVNORM_OUT = src/build/pretrends_mvnorm_windows.plugin
 	F77FLAGS = -fPIC -O3
-	CUSTOM = /usr/lib/gcc/x86_64-x64-mingw/11/libgfortran.a
+	CUSTOM = /usr/lib/gcc/x86_64-w64-mingw/11/libgfortran.a
 else
 	UNAME_S := $(shell uname -s)
 	UNAME_M := $(shell uname -m)
