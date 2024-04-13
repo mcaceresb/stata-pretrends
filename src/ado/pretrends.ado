@@ -6,6 +6,7 @@ capture program drop pretrends
 program pretrends, rclass
     version 15.1
 
+    global PRETRENDS_MVNORM_WARN=1
     local powermain power(passthru)            //  target power for pre-test: reject if any pre-treatment coef is significant at alpha
     local poweropts b(str)                     /// name of coefficient vector; default is e(b)
                     Vcov(str)                  /// name of vcov matrix; default is e(V)
@@ -59,6 +60,7 @@ program pretrends, rclass
         cap mata mata desc `results'
         if ( _rc ) {
             disp as err "Cached results not found"
+            clean_exit
             exit 198
         }
     }
@@ -104,10 +106,12 @@ program pretrends, rclass
     }
 
     if ( `dopretrends' | ("`cached'" == "") ) {
-        PreTrendsSanityChecks, b(`b') vcov(`vcov') deltatrue(`deltatrue') ///
-            `alpha' `power' `slope' numpre(`numpreperiods')               ///
-            pre(`preperiodindices') post(`postperiodindices')             ///
+        cap noi PreTrendsSanityChecks, b(`b') vcov(`vcov') deltatrue(`deltatrue') ///
+            `alpha' `power' `slope' numpre(`numpreperiods')                       ///
+            pre(`preperiodindices') post(`postperiodindices')                     ///
             time(`timevector') ref(`referenceperiod') `customreference'
+        clean_exit
+        exit _rc
     }
     else {
         local alpha = 0.05
@@ -136,6 +140,7 @@ program pretrends, rclass
         return scalar Power = `power'
         return scalar slope = `slope'
         mata mata drop `results'
+        clean_exit
         exit 0
     }
 
@@ -145,6 +150,7 @@ program pretrends, rclass
         cap which coefplot
         if ( _rc ) {
             disp as err "-coefplot- not found; please install or use option -nocoefplot-"
+            clean_exit
             exit _rc
         }
     }
@@ -186,6 +192,7 @@ program pretrends, rclass
     return local PreTrendsResults = "`results'"
     mata PreTrendsPost(`results')
     return add
+    clean_exit
 end
 
 capture program drop PreTrendsSanityChecks
@@ -401,6 +408,11 @@ program PreTrendsSanityChecks
     c_local vcov:  copy local vcov
     c_local power: copy local power
     c_local slope: copy local slope
+end
+
+capture program drop clean_exit
+program clean_exit
+    mac drop PRETRENDS_MVNORM_WARN
 end
 
 if ( inlist("`c(os)'", "MacOSX") | strpos("`c(machine_type)'", "Mac") ) {

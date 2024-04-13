@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 jobs:
   buildosarm:
-    name: Compile MacOS
+    name: Compile MacOS (arm64)
     runs-on: macos-latest-arm64
     steps:
       - uses: actions/checkout@v2
@@ -32,8 +32,8 @@ jobs:
           [ -n "$(git status --porcelain)" ] && git commit -m "[Automated Commit] OSX plugin"
           git fetch
           git push -f origin HEAD:${GITHUB_REF##*/}
-  buildosx64:
-    name: Compile MacOS
+  buildosx86_64:
+    name: Compile MacOS (x86_64)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2

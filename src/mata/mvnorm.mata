@@ -81,9 +81,10 @@ real matrix function PreTrends_inverse(real vector ix, real scalar n)
 real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, real vector mu, real matrix sigma,
                                           | real scalar df, real scalar maxpts, real scalar abseps, real scalar releps)
 {
-    real scalar i, j, p, n
+    real scalar i, j, p, n, warn
     real vector correl, sd
 
+    warn = strofreal(st_global("PRETRENDS_MVNORM_WARN"))
     n = length(mu)
     if ( n < 2 ) {
         return(normal((upper - mu) / sqrt(sigma)) - normal((lower - mu) / sqrt(sigma)))
@@ -145,33 +146,39 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
             }
             else {
                 if ( st_numscalar("__pretrends_mvnorm_INFORM") == 1 ) {
-                    errprintf("ERROR: Unable to achieve desired tolerance; falling back on mata.\n")
+                    if ( warn ) errprintf("ERROR: Unable to achieve desired tolerance; falling back on mata.\n")
+                    
                 }
                 else if ( st_numscalar("__pretrends_mvnorm_INFORM") == 2 ) {
-                    errprintf("ERROR: Unable to handle problems of size %g; falling back on mata.\n", n)
+                    if ( warn ) errprintf("ERROR: Unable to handle problems of size %g; falling back on mata.\n", n)
+                    
                 }
                 else if ( st_numscalar("__pretrends_mvnorm_INFORM") == 3 ) {
-                    errprintf("ERROR: vcov not PSD; falling back on mata.\n")
+                    if ( warn ) errprintf("ERROR: vcov not PSD; falling back on mata.\n")
+                    
                 }
                 st_numscalar("__pretrends_mvnorm_rc", 17290 + st_numscalar("__pretrends_mvnorm_INFORM"))
             }
         }
         else {
-            errprintf("WARNING: Unknown error; falling back on mata.\n")
+            if ( warn ) errprintf("WARNING: Unknown error; falling back on mata.\n")
         }
     }
     else {
-        errprintf("WARNING: Unable to load mvnormalcv() plugin; falling back on mata.\n")
+        if ( warn ) errprintf("WARNING: Unable to load mvnormalcv() plugin; falling back on mata.\n")
     }
 
     // Fallback if error
     // -----------------
 
     if ( st_numscalar("__pretrends_mvnorm_rc") ) {
-        errprintf("Execution may be excessively slow. If it takes more a few minutes\n")
-        errprintf("we recommend using the R package.\n")
-        if ( args() >= 5 ) {
-            errprintf("WARNING: Additional arguments ignored with fallback.\n")
+        if ( warn ) {
+            errprintf("Execution may be excessively slow. If it takes more a few minutes\n")
+            errprintf("we recommend using the R package.\n")
+            if ( args() >= 5 ) {
+                errprintf("WARNING: Additional arguments ignored with fallback.\n")
+            }
+            st_global("PRETRENDS_MVNORM_WARN", "0")
         }
         p = mvnormalcv(lower, upper, mu, vech(sigma)')
     }
@@ -197,7 +204,3 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
     return(p)
 }
 end
-
-* xx global so warning only shows up once
-* xx option to NOT use the plugin
-* xx osx arm64 warning
