@@ -1,0 +1,59 @@
+name: compile-nix-plugins
+on:
+  push:
+    branches: [ main, issues_mvnormalcv ]
+    paths:
+      - 'src/plugin'
+  pull_request:
+    branches: [ main, issues_mvnormalcv ]
+    paths:
+      - 'src/plugin'
+  workflow_dispatch:
+jobs:
+  buildos:
+    name: Compile MacOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: compile x86_64
+        run: |
+          make all MVNORM_OUT=src/build/pretrends_mvnorm_macosx86_64.plugin ARCH="-arch x86_64"
+          shasum src/build/pretrends_mvnorm_macosx86_64.plugin
+          otool -L src/build/pretrends_mvnorm_macosx86_64.plugin
+      - name: compile arm64
+        run: |
+          make all MVNORM_OUT=src/build/pretrends_mvnorm_macosxarm64.plugin ARCH="-arch arm64"
+          shasum src/build/pretrends_mvnorm_macosxarm64.plugin
+          otool -L src/build/pretrends_mvnorm_macosxarm64.plugin
+      - name: combine plugins
+        run: |
+          rm -f src/build/pretrends_mvnorm_macosx.plugin
+          lipo -create -output src/build/pretrends_mvnorm_macosx.plugin src/build/pretrends_mvnorm_macosx86_64.plugin src/build/pretrends_mvnorm_macosxarm64.plugin
+          shasum src/build/pretrends_mvnorm_macosx.plugin
+          otool -L src/build/pretrends_mvnorm_macosx.plugin
+      - name: commit plugin
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add -f src/build/pretrends_mvnorm_macosx*.plugin
+          echo ${GITHUB_REF##*/}
+          [ -n "$(git status --porcelain)" ] && git commit -m "[Automated Commit] OSX plugin"
+          git fetch
+          git push -f origin HEAD:${GITHUB_REF##*/}
+  buildlinux:
+    name: Compile Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Compile Linux
+        run: |
+          RUN_CLONE=0 RUN_OS=LINUX bash src/compile.sh
+      - name: Commit plugin
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add -f src/build/pretrends_mvnorm_unix.plugin
+          echo ${GITHUB_REF##*/}
+          [ -n "$(git status --porcelain)" ] && git commit -m "[Automated Commit] Linux plugin"
+          git fetch
+          git push -f origin HEAD:${GITHUB_REF##*/}
