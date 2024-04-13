@@ -18,5 +18,10 @@
 ST_retcode pretrends_mvnorm_read_vector(char *, ST_double *);
 ST_retcode pretrends_mvnorm_read_scalar(char *, int32_t *);
 ST_retcode pretrends_mvnorm();
+void mvtdst_(int32_t *, int32_t *,
+             ST_double *, ST_double *, int32_t *,
+             ST_double *, ST_double *,
+             int32_t *, ST_double *, ST_double *,
+             ST_double *, ST_double *, int32_t *);
 
 #endif
