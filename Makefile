@@ -2,34 +2,34 @@
 # OS parsing
 
 ifeq ($(OS),Windows_NT)
-	OSFLAGS = -shared -fPIC -lgfortran
+	OSFLAGS = -shared -fPIC
 	GCC = x86_64-w64-mingw32-gcc.exe
 	GFORTRAN = x86_64-w64-mingw32-gfortran.exe
 	MVNORM_OUT = src/build/pretrends_mvnorm_windows.plugin
 	F77FLAGS = -fPIC -O3
-	ARCH =
+	CUSTOM = /usr/lib/gcc/x86_64-x64-mingw/11/libgfortran.a
 else
 	UNAME_S := $(shell uname -s)
 	UNAME_M := $(shell uname -m)
 	ifeq ($(UNAME_S),Linux)
 		GCC = gcc
 		GFORTRAN = gfortran
-		OSFLAGS = -shared -fPIC -DSYSTEM=OPUNIX -lgfortran
+		OSFLAGS = -shared -fPIC -DSYSTEM=OPUNIX -static-libgfortran
 		F77FLAGS = -fPIC -DSYSTEM=OPUNIX -O3
 		MVNORM_OUT = src/build/pretrends_mvnorm_unix.plugin
-		ARCH =
+		CUSTOM =
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		GCC = clang
 		GFORTRAN = gfortran
-		OSFLAGS = -bundle -DSYSTEM=APPLEMAC -lgfortran
+		OSFLAGS = -bundle -DSYSTEM=APPLEMAC -static-libgfortran
 		F77FLAGS = -bundle -O3
 		ifeq ($(UNAME_M),x86_64)
-			ARCH = -arch x86_64
+			CUSTOM = -arch x86_64
 			MVNORM_OUT = src/build/pretrends_mvnorm_macosx86_64.plugin
 		endif
 		ifeq ($(UNAME_M),arm64)
-			ARCH = -arch arm64
+			CUSTOM = -arch arm64
 			MVNORM_OUT = src/build/pretrends_mvnorm_macosxarm64.plugin
 		endif
 	endif
@@ -38,7 +38,7 @@ endif
 ifeq ($(EXECUTION),windows)
 	OSFLAGS = -shared -lgfortran
 	F77FLAGS =
-	ARCH =
+	CUSTOM =
 	GCC = x86_64-w64-mingw32-gcc
 	GFORTRAN = x86_64-w64-mingw32-gfortran
 	MVNORM_OUT = src/build/pretrends_mvnorm_windows.plugin
@@ -57,10 +57,10 @@ all: clean mvnorm
 
 ## Compile mvnorm plugin
 src/plugin/mvtdstpack.o: src/plugin/mvtdstpack.f
-	$(GFORTRAN) -c $^ -o $@ $(F77FLAGS) $(ARCH) -std=legacy
+	$(GFORTRAN) -c $^ -o $@ $(F77FLAGS) $(CUSTOM) -std=legacy
 
 mvnorm: src/plugin/mvtdstpack.o src/plugin/pretrends_mvnorm.c src/plugin/stplugin.c
-	$(GCC) $(CFLAGS) -o $(MVNORM_OUT) $(ARCH) $^
+	$(GCC) $(CFLAGS) -o $(MVNORM_OUT) $(CUSTOM) $^
 
 .PHONY: clean
 clean:

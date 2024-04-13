@@ -12,62 +12,6 @@
 *          Pullman, WA 99164-3113
 *          Email : AlanGenz@wsu.edu
 *
-      PROGRAM TSTMVT
-*
-*     Test program for MVTDST
-*
-      DOUBLE PRECISION ABSEPS, RELEPS, VALS, ERRS
-      INTEGER N, NN, NU, I, J, IJ, MAXPTS, IFTS
-      PARAMETER ( N = 5, NN = ((N-1)*N)/2, MAXPTS = 25000 )
-      PARAMETER ( ABSEPS = 0, RELEPS = 0.0005 )
-      DOUBLE PRECISION CORREL(NN), LOW(N), UP(N), DELTA(N)
-      INTEGER INFIN(N)
-      DATA ( UP(I),     I = 1, N )    /  N*2D0   /
-      DATA ( LOW(I),    I = 1, N )    /  N*0D0   /
-      DATA ( DELTA(I),  I = 1, N )    /  N*1D0   /
-      DATA ( INFIN(I),  I = 1, N )    /  N*0     /
-      DATA ( CORREL(I), I = 1, NN )   / NN*0.75D0 /
-      PRINT '(''        Test of MVTDST'')'
-      PRINT '(5X, ''Requested Accuracy '',F8.5)', MAX(ABSEPS,RELEPS)
-      PRINT '(5X,''Number of Dimensions is '',I2)',N
-      PRINT '(''     Maximum # of Function Values is '',I7)', MAXPTS
-*
-      PRINT '(/'' I     Limits''/''    Lower  Upper  Delta'','//    
-     &     ' 5X, ''Lower Left of Correlation Matrix'')'
-      IJ = 0
-      DO I = 1, N
-         IF ( INFIN(I) .LT. 0 ) THEN 
-            PRINT '(I2, '' -infin  infin '', F7.4, 7F9.4)',
-     &           I, DELTA(I), ( CORREL(IJ+J), J = 1,I-1 ), 1.0
-         ELSE IF ( INFIN(I) .EQ. 0 ) THEN 
-            PRINT '(I2, '' -infin'', 2F7.4, 1X, 6F9.4)',
-     &           I, UP(I), DELTA(I), ( CORREL(IJ+J), J = 1,I-1 ), 1.0
-         ELSE IF ( INFIN(I) .EQ. 1 ) THEN 
-            PRINT '(I2, F7.4, ''  infin '', F7.4, 6F9.4)',
-     &           I, LOW(I), DELTA(I), ( CORREL(IJ+J), J = 1,I-1 ), 1.0
-         ELSE 
-            PRINT '(I2, 3F7.4, 1X, 6F9.4)', I, LOW(I), 
-     &           UP(I), DELTA(I), ( CORREL(IJ+J), J = 1,I-1 ), 1.0
-         ENDIF
-         IJ = IJ + I-1
-      END DO
-      DO NU = 10, 110, 25
-         PRINT '(4X,''Nu is '',I3)', NU
-         CALL MVTDST( N, NU, LOW, UP, INFIN, CORREL, DELTA,  
-     &        MAXPTS, ABSEPS, RELEPS, ERRS, VALS, IFTS )
-         PRINT '('' Results for:  MVTDST'')'
-         PRINT '('' Value:     '',2(F11.6,I4))', VALS, IFTS
-         PRINT '('' Error Est.:'',2X,''('',F8.6,'')'',3X)', ERRS
-      END DO
-      PRINT '(4X,''Nu is Infinity'')'
-      CALL MVTDST( N, -1, LOW, UP, INFIN, CORREL, DELTA,  
-     &     MAXPTS, ABSEPS, RELEPS, ERRS, VALS, IFTS )
-      PRINT '('' Results for:  MVTDST'')'
-      PRINT '('' Value:     '',2(F11.6,I4))', VALS, IFTS
-      PRINT '('' Error Est.:'',2X,''('',F8.6,'')'',3X)', ERRS
-*
-      END
-*
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
 *
