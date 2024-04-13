@@ -33,7 +33,7 @@ fail to detect violations of parallel trends.)
 If you’re not an R or Stata user, you may also be interested in the associated
 [Shiny app](https://github.com/jonathandroth/PretrendsPower).
 
-`version 0.4.4 04Apr2024` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
+`version 0.5.0 12Apr2024` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
 
 ## Installation
 
@@ -122,11 +122,13 @@ Let's illustrate the first use case:
 
 ```stata
 pretrends power 0.5, pre(1/3) post(4/7)
-* Slope for 50% power =  .0520662
+* Slope for 50% power =  .0520259
+
+
 
 return list
 * scalars:
-*               r(slope) =  .0520662479737356
+*               r(slope) =  .0520258592463583
 *               r(Power) =  .5
 ```
 
@@ -185,10 +187,10 @@ pre-test against the hypothesized trend.
 ```stata
 return list
 * scalars:
-*                  r(LR) =  .1057053251022486
-*               r(Bayes) =  .5690176868657247
-*               r(Power) =  .5000000000010107
-*               r(slope) =  .0520662479737356
+*                  r(LR) =  .1060132573627281
+*               r(Bayes) =  .569600090034879
+*               r(Power) =  .4994900487831323
+*               r(slope) =  .0520258592463583
 * 
 * macros:
 *    r(PreTrendsResults) : "PreTrendsResults"
@@ -201,14 +203,14 @@ return list
 matlist r(results)
 *              |         t    betahat         lb         ub  deltatrue  meanAft~g 
 * -------------+------------------------------------------------------------------
-*           r1 |        -4   .0667032  -.1182677    .251674  -.1561987  -.0923171 
-*           r2 |        -3  -.0077018  -.1587197   .1433162  -.1041325  -.0555576 
-*           r3 |        -2  -.0307691  -.1388096   .0772715  -.0520662  -.0279117 
+*           r1 |        -4   .0667031  -.1182677    .251674  -.1560776  -.0922706 
+*           r2 |        -3  -.0077018  -.1587197   .1433162  -.1040517  -.0555308 
+*           r3 |        -2  -.0307691  -.1388096   .0772715  -.0520259  -.0278964 
 *           r4 |        -1          0          0          0          0          0 
-*           r5 |         0   .0840307  -.0387567    .206818   .0520662   .0649147 
-*           r6 |         1   .2424418   .0664168   .4184668   .1041325   .1208691 
-*           r7 |         2    .219879   .0458768   .3938812   .1561987   .1694932 
-*           r8 |         3   .1910925  -.0028194   .3850045    .208265   .2245753 
+*           r5 |         0   .0840307  -.0387567    .206818   .0520259   .0648652 
+*           r6 |         1   .2424418   .0664168   .4184668   .1040517   .1207747 
+*           r7 |         2    .219879   .0458768   .3938812   .1560776   .1693622 
+*           r8 |         3   .1910925  -.0028194   .3850045   .2081034   .2244005 
 ```
 
 An explanation of the returned results is as follows:
@@ -255,9 +257,9 @@ pretrends, time(-4(1)3) ref(-1) deltatrue(deltaquad) coefplot
 ```stata
 return list
 * scalars:
-*                  r(LR) =  .4332635420562206
-*               r(Bayes) =  .3841447062350103
-*               r(Power) =  .6624492391878117
+*                  r(LR) =  .4332635208743188
+*               r(Bayes) =  .3841607227850589
+*               r(Power) =  .6624452630786029
 *               r(slope) =  .
 * 
 * macros:
@@ -270,14 +272,14 @@ return list
 matlist r(results)
 *              |         t    betahat         lb         ub  deltatrue  meanAft~g 
 * -------------+------------------------------------------------------------------
-*           r1 |        -4   .0667032  -.1182677    .251674  -.1561987  -.0923171 
-*           r2 |        -3  -.0077018  -.1587197   .1433162  -.1041325  -.0555576 
-*           r3 |        -2  -.0307691  -.1388096   .0772715  -.0520662  -.0279117 
+*           r1 |        -4   .0667031  -.1182677    .251674       .216   .1184971 
+*           r2 |        -3  -.0077018  -.1587197   .1433162       .096   .0403641 
+*           r3 |        -2  -.0307691  -.1388096   .0772715       .024   .0040414 
 *           r4 |        -1          0          0          0          0          0 
-*           r5 |         0   .0840307  -.0387567    .206818   .0520662   .0649147 
-*           r6 |         1   .2424418   .0664168   .4184668   .1041325   .1208691 
-*           r7 |         2    .219879   .0458768   .3938812   .1561987   .1694932 
-*           r8 |         3   .1910925  -.0028194   .3850045    .208265   .2245753 
+*           r5 |         0   .0840307  -.0387567    .206818       .024   .0093052 
+*           r6 |         1   .2424418   .0664168   .4184668       .096   .0729884 
+*           r7 |         2    .219879   .0458768   .3938812       .216   .2004352 
+*           r8 |         3   .1910925  -.0028194   .3850045       .384   .3617735 
 ```
 
 (Note when specifying `time()` and `ref()'` by default the vector `b()` and the matrix `v()` must start with the relevant coefficients. The number of pre-period  is taken to be the number of entries in the time vector strictly smaller than `ref()`, and the number of post-periods the number of entries strictly larger. `time()` and `ref()` may be combined with `pre()` and `post()`; `numpre()` may not be combined with either.)

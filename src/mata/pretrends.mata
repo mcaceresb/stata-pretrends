@@ -256,7 +256,7 @@ real scalar function PreTrendsRejectionProb(real vector betaPre, real matrix sig
 {
     real rowvector ub
     ub = rowshape(sqrt(diagonal(sigmaPre)), 1) * thresh
-    return(1 - mvnormalcv(-ub, ub, rowshape(betaPre, 1), vech(sigmaPre)'))
+    return(1 - PreTrends_mvnormalcv(-ub, ub, rowshape(betaPre, 1), sigmaPre, 0, ., epsilon(1)^(1/4), 0))
 }
 
 // Find zero of a function via bisection; while this is semi-generically
@@ -287,8 +287,9 @@ real scalar function PreTrendsBisect(pointer(real scalar function)f,
         _error(198)
     }
 
+    // Default in stats::unitroot is eps^1/4
     i      = 0
-    tol    = epsilon(1)^0.75
+    tol    = epsilon(1)^(1/4)
     reltol = epsilon(1)
     fx     = 1 + tol
     xdiff  = 1 + reltol

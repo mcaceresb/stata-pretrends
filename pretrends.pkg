@@ -1,4 +1,4 @@
-v 0.4.4
+v 0.5.0
 d
 d 'PRETRENDS': Pretrends
 d
@@ -9,9 +9,13 @@ d KW: event study
 d
 d Requires: Stata version 15.1
 d
-d Distribution-Date: 20240404
+d Distribution-Date: 20240412
 d
 f src/build/lpretrends.mlib
 f src/ado/pretrends.ado
 f doc/pretrends.sthlp
 f src/mata/pretrends.mata
+f src/build/pretrends_mvnorm_unix.plugin
+f src/build/pretrends_mvnorm_macosx.plugin
+f src/build/pretrends_mvnorm_macosx86_64.plugin
+f src/build/pretrends_mvnorm_macosxarm64.plugin
