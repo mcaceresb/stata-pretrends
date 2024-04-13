@@ -2,7 +2,7 @@
 # OS parsing
 
 ifeq ($(OS),Windows_NT)
-	OSFLAGS = -shared -fPIC
+	OSFLAGS = -shared -fPIC -lgfortran
 	GCC = x86_64-w64-mingw32-gcc.exe
 	GFORTRAN = x86_64-w64-mingw32-gfortran.exe
 	MVNORM_OUT = src/build/pretrends_mvnorm_windows.plugin
@@ -14,7 +14,7 @@ else
 	ifeq ($(UNAME_S),Linux)
 		GCC = gcc
 		GFORTRAN = gfortran
-		OSFLAGS = -shared -fPIC -DSYSTEM=OPUNIX
+		OSFLAGS = -shared -fPIC -DSYSTEM=OPUNIX -lgfortran
 		F77FLAGS = -fPIC -DSYSTEM=OPUNIX -O3
 		MVNORM_OUT = src/build/pretrends_mvnorm_unix.plugin
 		ARCH =
@@ -22,7 +22,7 @@ else
 	ifeq ($(UNAME_S),Darwin)
 		GCC = clang
 		GFORTRAN = gfortran
-		OSFLAGS = -bundle -DSYSTEM=APPLEMAC
+		OSFLAGS = -bundle -DSYSTEM=APPLEMAC -lgfortran
 		F77FLAGS = -bundle -O3
 		ifeq ($(UNAME_M),x86_64)
 			ARCH = -arch x86_64
@@ -36,7 +36,7 @@ else
 endif
 
 ifeq ($(EXECUTION),windows)
-	OSFLAGS = -shared
+	OSFLAGS = -shared -lgfortran
 	F77FLAGS =
 	ARCH =
 	GCC = x86_64-w64-mingw32-gcc

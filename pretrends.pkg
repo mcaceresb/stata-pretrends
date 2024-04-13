@@ -16,6 +16,4 @@ f src/ado/pretrends.ado
 f doc/pretrends.sthlp
 f src/mata/pretrends.mata
 f src/build/pretrends_mvnorm_unix.plugin
-f src/build/pretrends_mvnorm_macosx.plugin
-f src/build/pretrends_mvnorm_macosx86_64.plugin
-f src/build/pretrends_mvnorm_macosxarm64.plugin
+f src/build/pretrends_mvnorm_windows.plugin
