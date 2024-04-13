@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Compile Linux
         run: |
-          RUN_CLONE=0 RUN_OS=LINUX bash src/compile.sh
+          make all
       - name: Commit plugin
         run: |
           git config user.name github-actions

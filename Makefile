@@ -21,7 +21,7 @@ else
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		GCC = clang
-		GFORTRAN = flang
+		GFORTRAN = gfortran
 		OSFLAGS = -bundle -DSYSTEM=APPLEMAC
 		F77FLAGS = -bundle -O3
 		ifeq ($(UNAME_M),x86_64)
