@@ -110,8 +110,10 @@ program pretrends, rclass
             `alpha' `power' `slope' numpre(`numpreperiods')                       ///
             pre(`preperiodindices') post(`postperiodindices')                     ///
             time(`timevector') ref(`referenceperiod') `customreference'
-        clean_exit
-        exit _rc
+        if ( _rc ) {
+            clean_exit
+            exit _rc
+        }
     }
     else {
         local alpha = 0.05
@@ -193,6 +195,7 @@ program pretrends, rclass
     mata PreTrendsPost(`results')
     return add
     clean_exit
+    exit 0
 end
 
 capture program drop PreTrendsSanityChecks

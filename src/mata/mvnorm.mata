@@ -84,7 +84,7 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
     real scalar i, j, p, n, warn
     real vector correl, sd
 
-    warn = strofreal(st_global("PRETRENDS_MVNORM_WARN"))
+    warn = strtoreal(st_global("PRETRENDS_MVNORM_WARN"))
     n = length(mu)
     if ( n < 2 ) {
         return(normal((upper - mu) / sqrt(sigma)) - normal((lower - mu) / sqrt(sigma)))
@@ -175,9 +175,9 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
         if ( warn ) {
             errprintf("Execution may be excessively slow. If it takes more a few minutes\n")
             errprintf("we recommend using the R package.\n")
-            if ( args() >= 5 ) {
-                errprintf("WARNING: Additional arguments ignored with fallback.\n")
-            }
+            // if ( args() >= 5 ) {
+            //     errprintf("WARNING: Additional arguments ignored with fallback.\n")
+            // }
             st_global("PRETRENDS_MVNORM_WARN", "0")
         }
         p = mvnormalcv(lower, upper, mu, vech(sigma)')
