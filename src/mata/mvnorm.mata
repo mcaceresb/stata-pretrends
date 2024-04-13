@@ -197,3 +197,7 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
     return(p)
 }
 end
+
+* xx global so warning only shows up once
+* xx option to NOT use the plugin
+* xx osx arm64 warning

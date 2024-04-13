@@ -17,24 +17,24 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup GNU Fortran
         uses: modflowpy/install-gfortran-action@v1
-      - name: compile arm64
-        run: |
-          make all MVNORM_OUT=src/build/pretrends_mvnorm_macosxarm64.plugin ARCH="-arch arm64"
-          shasum src/build/pretrends_mvnorm_macosxarm64.plugin
-          otool -L src/build/pretrends_mvnorm_macosxarm64.plugin
-          rm -f src/plugin/mvtdstpack.o
+      # - name: compile arm64
+      #   run: |
+      #     make all MVNORM_OUT=src/build/pretrends_mvnorm_macosxarm64.plugin ARCH="-arch arm64"
+      #     shasum src/build/pretrends_mvnorm_macosxarm64.plugin
+      #     otool -L src/build/pretrends_mvnorm_macosxarm64.plugin
+      #     rm -f src/plugin/mvtdstpack.o
       - name: compile x86_64
         run: |
           make all MVNORM_OUT=src/build/pretrends_mvnorm_macosx86_64.plugin ARCH="-arch x86_64"
           shasum src/build/pretrends_mvnorm_macosx86_64.plugin
           otool -L src/build/pretrends_mvnorm_macosx86_64.plugin
           rm -f src/plugin/mvtdstpack.o
-      - name: combine plugins
-        run: |
-          rm -f src/build/pretrends_mvnorm_macosx.plugin
-          lipo -create -output src/build/pretrends_mvnorm_macosx.plugin src/build/pretrends_mvnorm_macosx86_64.plugin src/build/pretrends_mvnorm_macosxarm64.plugin
-          shasum src/build/pretrends_mvnorm_macosx.plugin
-          otool -L src/build/pretrends_mvnorm_macosx.plugin
+      # - name: combine plugins
+      #   run: |
+      #     rm -f src/build/pretrends_mvnorm_macosx.plugin
+      #     lipo -create -output src/build/pretrends_mvnorm_macosx.plugin src/build/pretrends_mvnorm_macosx86_64.plugin src/build/pretrends_mvnorm_macosxarm64.plugin
+      #     shasum src/build/pretrends_mvnorm_macosx.plugin
+      #     otool -L src/build/pretrends_mvnorm_macosx.plugin
       - name: commit plugin
         run: |
           git config user.name github-actions
