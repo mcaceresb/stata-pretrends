@@ -33,7 +33,7 @@ fail to detect violations of parallel trends.)
 If you’re not an R or Stata user, you may also be interested in the associated
 [Shiny app](https://github.com/jonathandroth/PretrendsPower).
 
-`version 0.5.0 12Apr2024` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
+`version 0.5.1 20Apr2024` | [Installation](#installation) | [Application](#application-to-he-and-wang-2017)
 
 ## Installation
 

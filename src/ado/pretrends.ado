@@ -1,4 +1,4 @@
-*! version 0.5.0 12Apr2024 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
+*! version 0.5.1 20Apr2024 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
 *! Power calculations and visualization for pre-trends tests (translation of R package)
 
 * xx need more unit testing for pre/post and time/ref combinations
@@ -419,22 +419,12 @@ program clean_exit
 end
 
 if ( inlist("`c(os)'", "MacOSX") | strpos("`c(machine_type)'", "Mac") ) {
-    local c_os_ macosx
+    local c_os_ macosxarm64
     cap program drop pretrends_mvnorm_plugin
-    local rc = 0
     cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
-    local rc = _rc | `rc'
-    if `rc' {
-        local c_os_ macosxarm64
-        local rc = 0
-        cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
-        local rc = _rc | `rc'
-    }
-    if `rc' {
+    if _rc {
         local c_os_ macosx86_64
-        local rc = 0
         cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
-        local rc = _rc | `rc'
     }
 }
 else {
