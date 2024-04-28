@@ -11,6 +11,8 @@ program pretrends, rclass
     local poweropts b(str)                     /// name of coefficient vector; default is e(b)
                     Vcov(str)                  /// name of vcov matrix; default is e(V)
                                                ///
+                    _skip_plugin               /// do not use plugin
+                    _debug_plugin              /// debug plugin
                     omit                       /// Omit levels parsing b vector column names
                     alpha(passthru)            /// significance level
                     NUMPREperiods(int 0)       /// number of pre-treatment periods
@@ -51,6 +53,8 @@ program pretrends, rclass
             *           /// Options for coefplot
         ]
     }
+    global PRETRENDS_MVNORM_SKIP  = ("`_skip_plugin'"  == "_skip_plugin")
+    global PRETRENDS_MVNORM_DEBUG = ("`_debug_plugin'" == "_debug_plugin")
 
     if "`matasave'" == "" local results PreTrendsResults
     else local results: copy local matasave
@@ -416,6 +420,8 @@ end
 capture program drop clean_exit
 program clean_exit
     mac drop PRETRENDS_MVNORM_WARN
+    mac drop PRETRENDS_MVNORM_SKIP
+    mac drop PRETRENDS_MVNORM_DEBUG
 end
 
 if ( inlist("`c(os)'", "MacOSX") | strpos("`c(machine_type)'", "Mac") ) {

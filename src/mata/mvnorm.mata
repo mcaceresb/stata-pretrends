@@ -78,16 +78,45 @@ real matrix function PreTrends_inverse(real vector ix, real scalar n)
     return(selectindex(sel))
 }
 
-real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, real vector mu, real matrix sigma,
-                                          | real scalar df, real scalar maxpts, real scalar abseps, real scalar releps)
+// df     - degrees of freedom (0 for normal, > 1 for t)
+// maxpts - max fun values allowed (increased automatically
+//          internally if tolerance not achiaved; set to a
+//          low number if you plan to tighten the tolerance).
+// abseps - error abs tolerance (lower for precision)
+// releps - error rel tolerance (lower for precision)
+// releps - error rel tolerance (lower for precision)
+real vector function PreTrends_mvnormalcv(real vector lower,
+                                          real vector upper,
+                                          real vector mu,
+                                          real matrix sigma,
+                                          | real scalar df,
+                                          real scalar maxpts,
+                                          real scalar abseps,
+                                          real scalar releps,
+                                          real scalar reterr)
 {
-    real scalar i, j, p, n, warn
+    real scalar i, j, p, e, n, warn, skip, debug
     real vector correl, sd
 
-    warn = strtoreal(st_global("PRETRENDS_MVNORM_WARN"))
-    n = length(mu)
+    if ( (args() < 9) | (missing(reterr)) ) reterr = 0
+
+    warn  = strtoreal(st_global("PRETRENDS_MVNORM_WARN"))  == 1
+    skip  = strtoreal(st_global("PRETRENDS_MVNORM_SKIP"))  == 1
+    debug = strtoreal(st_global("PRETRENDS_MVNORM_DEBUG")) == 1
+    n     = length(mu)
+
     if ( n < 2 ) {
-        return(normal((upper - mu) / sqrt(sigma)) - normal((lower - mu) / sqrt(sigma)))
+        if ( debug ) printf("NOTE: use built-in normal() for univariate input\n")
+        p = normal((upper - mu) / sqrt(sigma)) - normal((lower - mu) / sqrt(sigma))
+        e = .
+        return(reterr? (p, e): p)
+    }
+
+    if ( skip ) {
+        if ( debug ) printf("NOTE: use built-in mvnormalcv() with option -_skip_plugin-\n")
+        p = mvnormalcv(lower, upper, mu, vech(sigma)')
+        e = .
+        return(reterr? (p, e): p)
     }
 
     // Check plugin
@@ -97,6 +126,7 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
     stata("scalar __pretrends_mvnorm_rc = _rc")
 
     if ( st_numscalar("__pretrends_mvnorm_rc") == 0 ) {
+        if ( debug ) printf("NOTE: plugin check successful; calling fortran...\n")
 
         // Parse and format input
         // ----------------------
@@ -131,6 +161,7 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
 
         st_numscalar("__pretrends_mvnorm_INFORM", 1)
         while ( (st_numscalar("__pretrends_mvnorm_INFORM") == 1) & (st_numscalar("__pretrends_mvnorm_rc") == 0) ) {
+            if ( debug ) printf("NOTE: internal convergence check (maxpts = %g)\n", maxpts)
             stata("cap noi plugin call pretrends_mvnorm_plugin, _plugin_run")
             stata("scalar __pretrends_mvnorm_rc = _rc")
             maxpts = 10 * maxpts
@@ -141,10 +172,14 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
         // ----------------
 
         if ( st_numscalar("__pretrends_mvnorm_rc") == 0 ) {
+            if ( debug ) printf("NOTE: no plugin errors; checking return code\n")
             if ( st_numscalar("__pretrends_mvnorm_INFORM") == 0 ) {
+                if ( debug ) printf("NOTE: success!\n")
                 p = st_numscalar("__pretrends_mvnorm_VALUE")
+                e = st_numscalar("__pretrends_mvnorm_ERROR")
             }
             else {
+                if ( debug ) printf("NOTE: error code %g\n", st_numscalar("__pretrends_mvnorm_INFORM"))
                 if ( st_numscalar("__pretrends_mvnorm_INFORM") == 1 ) {
                     if ( warn ) errprintf("ERROR: Unable to achieve desired tolerance; falling back on mata.\n")
                     
@@ -172,6 +207,7 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
     // -----------------
 
     if ( st_numscalar("__pretrends_mvnorm_rc") ) {
+        if ( debug ) printf("NOTE: falling back on built-in mvnormalcv()\n")
         if ( warn ) {
             errprintf("Execution may be excessively slow. If it takes more a few minutes\n")
             errprintf("we recommend using the R package.\n")
@@ -181,6 +217,7 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
             st_global("PRETRENDS_MVNORM_WARN", "0")
         }
         p = mvnormalcv(lower, upper, mu, vech(sigma)')
+        e = .
     }
 
     // Cleanup
@@ -201,6 +238,6 @@ real scalar function PreTrends_mvnormalcv(real vector lower, real vector upper, 
     st_matrix("__pretrends_mvnorm_CORREL", J(0, 0, .))
     st_matrix("__pretrends_mvnorm_DELTA",  J(0, 0, .))
 
-    return(p)
+    return(reterr? (p, e): p)
 }
 end

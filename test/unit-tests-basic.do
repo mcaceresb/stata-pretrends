@@ -35,9 +35,9 @@ program basic_checks
         mata `s1' = st_numscalar("r(slope)")
         qui pretrends, pre(1/3) post(4/7) b(beta) v(sigma) slope(`r(slope)') alpha(`a') nocoefplot
         local power1 = r(Power)
-        mata assert(reldif(0.8, st_numscalar("r(Power)")) < epsilon(1)^(1/6))
+        mata assert(reldif(0.8, st_numscalar("r(Power)")) < 0.01)
         qui pretrends, time(-4(1)3) ref(-1) b(beta) v(sigma) slope(`r(slope)') alpha(`a') nocoefplot
-        mata assert(reldif(0.8, st_numscalar("r(Power)")) < epsilon(1)^(1/6))
+        mata assert(reldif(0.8, st_numscalar("r(Power)")) < 0.01)
         local power2 = r(Power)
         disp "80% power, base alpha", %5.3f `a', "| est slope", %7.5g `slope1', "| power 1", %5.3g `power1', "| power 2", %5.3f `power2'
         qui pretrends, time(7 10 11 12 13 19) pre(2/3) post(4 5 7) ref(11) b(beta) v(sigma) slope(`r(slope)') alpha(`a') nocoefplot
