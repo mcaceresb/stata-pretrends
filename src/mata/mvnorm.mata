@@ -216,7 +216,7 @@ real vector function PreTrends_mvnormalcv(real vector lower,
             // }
             st_global("PRETRENDS_MVNORM_WARN", "0")
         }
-        p = mvnormalcv(lower, upper, mu, vech(sigma)')
+        p = mvnormalcv(rowshape(lower, 1), rowshape(upper, 1), rowshape(mu, 1), vech(sigma)')
         e = .
     }
 

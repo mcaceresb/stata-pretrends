@@ -2,6 +2,21 @@ capture program drop mvnorm_checks
 program mvnorm_checks
     syntax, [*]
 
+    if ( inlist("`c(os)'", "MacOSX") | strpos("`c(machine_type)'", "Mac") ) {
+        local c_os_ macosxarm64
+        cap program drop pretrends_mvnorm_plugin
+        cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
+        if _rc {
+            local c_os_ macosx86_64
+            cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
+        }
+    }
+    else {
+        local c_os_: di lower("`c(os)'")
+        cap program drop pretrends_mvnorm_plugin
+        cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
+    }
+
     local N=100
     mata N=`N'
     mata M=round(3 * rnormal(N, 1, 0, 1), 1)/3
@@ -80,18 +95,3 @@ program mvnorm_checks
     }
     mata _=(length(means), ., PreTrends_mvnormalcv(-bound, bound, means, S, 0, ., ., ., 1))
 end
-
-if ( inlist("`c(os)'", "MacOSX") | strpos("`c(machine_type)'", "Mac") ) {
-    local c_os_ macosxarm64
-    cap program drop pretrends_mvnorm_plugin
-    cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
-    if _rc {
-        local c_os_ macosx86_64
-        cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
-    }
-}
-else {
-    local c_os_: di lower("`c(os)'")
-    cap program drop pretrends_mvnorm_plugin
-    cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
-}
