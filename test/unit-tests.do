@@ -1,12 +1,15 @@
+set seed 1729
 version 15.1
 qui do test/unit-tests-basic.do
+qui do test/unit-tests-mvnorm.do
 * qui do src/ado/pretrends.ado
 * qui do src/mata/pretrends.mata
 
 capture program drop main
 program main
-    unit_test basic_failures
-    unit_test basic_checks
+    unit_test basic_failures , noi
+    unit_test basic_checks   , noi
+    unit_test mvnorm_checks  , noi
 end
 
 capture program drop unit_test

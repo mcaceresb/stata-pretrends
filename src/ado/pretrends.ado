@@ -1,4 +1,4 @@
-*! version 0.4.4 04Apr2024 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
+*! version 0.5.1 20Apr2024 Mauricio Caceres Bravo, mauricio.caceres.bravo@gmail.com
 *! Power calculations and visualization for pre-trends tests (translation of R package)
 
 * xx need more unit testing for pre/post and time/ref combinations
@@ -6,10 +6,13 @@ capture program drop pretrends
 program pretrends, rclass
     version 15.1
 
+    global PRETRENDS_MVNORM_WARN=1
     local powermain power(passthru)            //  target power for pre-test: reject if any pre-treatment coef is significant at alpha
     local poweropts b(str)                     /// name of coefficient vector; default is e(b)
                     Vcov(str)                  /// name of vcov matrix; default is e(V)
                                                ///
+                    _skip_plugin               /// do not use plugin
+                    _debug_plugin              /// debug plugin
                     omit                       /// Omit levels parsing b vector column names
                     alpha(passthru)            /// significance level
                     NUMPREperiods(int 0)       /// number of pre-treatment periods
@@ -50,6 +53,8 @@ program pretrends, rclass
             *           /// Options for coefplot
         ]
     }
+    global PRETRENDS_MVNORM_SKIP  = ("`_skip_plugin'"  == "_skip_plugin")
+    global PRETRENDS_MVNORM_DEBUG = ("`_debug_plugin'" == "_debug_plugin")
 
     if "`matasave'" == "" local results PreTrendsResults
     else local results: copy local matasave
@@ -59,6 +64,7 @@ program pretrends, rclass
         cap mata mata desc `results'
         if ( _rc ) {
             disp as err "Cached results not found"
+            clean_exit
             exit 198
         }
     }
@@ -104,10 +110,14 @@ program pretrends, rclass
     }
 
     if ( `dopretrends' | ("`cached'" == "") ) {
-        PreTrendsSanityChecks, b(`b') vcov(`vcov') deltatrue(`deltatrue') ///
-            `alpha' `power' `slope' numpre(`numpreperiods')               ///
-            pre(`preperiodindices') post(`postperiodindices')             ///
+        cap noi PreTrendsSanityChecks, b(`b') vcov(`vcov') deltatrue(`deltatrue') ///
+            `alpha' `power' `slope' numpre(`numpreperiods')                       ///
+            pre(`preperiodindices') post(`postperiodindices')                     ///
             time(`timevector') ref(`referenceperiod') `customreference'
+        if ( _rc ) {
+            clean_exit
+            exit _rc
+        }
     }
     else {
         local alpha = 0.05
@@ -136,6 +146,7 @@ program pretrends, rclass
         return scalar Power = `power'
         return scalar slope = `slope'
         mata mata drop `results'
+        clean_exit
         exit 0
     }
 
@@ -145,6 +156,7 @@ program pretrends, rclass
         cap which coefplot
         if ( _rc ) {
             disp as err "-coefplot- not found; please install or use option -nocoefplot-"
+            clean_exit
             exit _rc
         }
     }
@@ -186,6 +198,8 @@ program pretrends, rclass
     return local PreTrendsResults = "`results'"
     mata PreTrendsPost(`results')
     return add
+    clean_exit
+    exit 0
 end
 
 capture program drop PreTrendsSanityChecks
@@ -402,3 +416,25 @@ program PreTrendsSanityChecks
     c_local power: copy local power
     c_local slope: copy local slope
 end
+
+capture program drop clean_exit
+program clean_exit
+    mac drop PRETRENDS_MVNORM_WARN
+    mac drop PRETRENDS_MVNORM_SKIP
+    mac drop PRETRENDS_MVNORM_DEBUG
+end
+
+if ( inlist("`c(os)'", "MacOSX") | strpos("`c(machine_type)'", "Mac") ) {
+    local c_os_ macosxarm64
+    cap program drop pretrends_mvnorm_plugin
+    cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
+    if _rc {
+        local c_os_ macosx86_64
+        cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
+    }
+}
+else {
+    local c_os_: di lower("`c(os)'")
+    cap program drop pretrends_mvnorm_plugin
+    cap program pretrends_mvnorm_plugin, plugin using("pretrends_mvnorm_`c_os_'.plugin")
+}
