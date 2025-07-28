@@ -34,14 +34,20 @@ config_files = [
     ('pretrends.pkg', 'd Distribution-Date: {date:%Y%m%d}'),
     ('stata.toc', 'v {major}.{minor}.{patch}'),
     ('doc/pretrends.sthlp', 'version {major}.{minor}.{patch} {date:%d%b%Y}'),
-    ('src/ado/pretrends.ado', 'version {major}.{minor}.{patch} {date:%d%b%Y}')
+    ('src/ado/pretrends.ado', 'version {major}.{minor}.{patch} {date:%d%b%Y}'),
+    ('src/plugin/pretrends_mvnorm.h', 'PRETRENDS_MVNORM_VERSION "{major}.{minor}.{patch}"')
 ]
 
 config_standalone = {
     'pretrends': [
         'src/build/lpretrends.mlib',
         'src/ado/pretrends.ado',
-        'doc/pretrends.sthlp'
+        'src/mata/pretrends.mata',
+        'doc/pretrends.sthlp',
+        'src/build/pretrends_mvnorm_unix.plugin',
+        'src/build/pretrends_mvnorm_windows.plugin',
+        'src/build/pretrends_mvnorm_macosx86_64.plugin',
+        'src/build/pretrends_mvnorm_macosxarm64.plugin'
     ]
 }
 
