@@ -43,6 +43,7 @@ config_standalone = {
         'src/build/lpretrends.mlib',
         'src/ado/pretrends.ado',
         'src/mata/pretrends.mata',
+        'src/mata/mvnorm.mata',
         'doc/pretrends.sthlp',
         'src/build/pretrends_mvnorm_unix.plugin',
         'src/build/pretrends_mvnorm_windows.plugin',
